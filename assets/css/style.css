@@ -23,6 +23,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 img { max-width: 100%; display: block; }
@@ -515,29 +516,89 @@ ul { list-style: none; }
 .footer__socials a:hover { background: var(--gold); color: #1a1a1a; }
 
 /* === Responsive === */
+@media (max-width: 1024px) {
+  .nav { gap: 18px; }
+  .nav a { font-size: 14px; }
+}
+
 @media (max-width: 900px) {
+  .container { padding: 0 20px; }
   .about, .contact, .business, .mobile { grid-template-columns: 1fr; gap: 40px; }
   .form { grid-template-columns: 1fr; padding: 24px; }
   .plan--featured { transform: none; }
   .section { padding: 70px 0; }
-}
 
-@media (max-width: 760px) {
   .nav {
     position: fixed;
-    top: 80px;
+    top: 72px;
     left: 0; right: 0;
     background: var(--bg-alt);
     flex-direction: column;
-    padding: 24px;
-    gap: 16px;
+    padding: 20px;
+    gap: 14px;
     border-bottom: 1px solid var(--border);
     transform: translateY(-150%);
     transition: transform var(--transition);
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
   }
   .nav.open { transform: translateY(0); }
   .burger { display: flex; }
   .header__cta { display: none; }
-  .hero__stats { gap: 24px; }
-  .hero__stats strong { font-size: 28px; }
+}
+
+@media (max-width: 700px) {
+  .container { padding: 0 16px; }
+  .header__inner { height: 72px; }
+  .logo img { height: 44px; }
+
+  .section { padding: 56px 0; }
+  .section__title { margin-bottom: 36px; }
+
+  .hero { min-height: auto; padding: 80px 0 60px; }
+  .hero__content { padding: 20px 0; }
+  .hero__sub { font-size: 16px; margin-bottom: 28px; }
+  .hero__actions { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 40px; }
+  .hero__actions .btn { width: 100%; }
+  .hero__stats { gap: 18px; }
+  .hero__stats li { flex: 1 1 30%; min-width: 0; }
+  .hero__stats strong { font-size: 24px; }
+  .hero__stats span { font-size: 12px; }
+
+  .services, .pricing, .addons, .reviews { gap: 16px; }
+  .service, .plan, .addon, .review, .mobile__card { padding: 28px 22px; }
+
+  .plan__price { font-size: 24px; }
+  .plan__name, .addon h3, .mobile__card h3 { font-size: 20px; }
+
+  .about__image { aspect-ratio: 16/10; }
+
+  .business__stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .business__stats > div { padding: 20px 14px; }
+  .business__stats strong { font-size: 26px; }
+
+  .form { padding: 20px; gap: 14px; }
+  .form input, .form select, .form textarea { font-size: 16px; padding: 12px 12px; } /* 16px prevents iOS zoom */
+  .form__total-row--final strong { font-size: 22px; }
+
+  .gallery { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .footer__inner { flex-direction: column; text-align: center; gap: 18px; }
+  .footer__nav, .footer__socials { justify-content: center; flex-wrap: wrap; }
+
+  .contact__list li { font-size: 14px; }
+  .contact__map iframe { height: 200px; }
+}
+
+@media (max-width: 420px) {
+  .hero__title { font-size: 32px; }
+  .hero__eyebrow { font-size: 12px; letter-spacing: 2px; }
+  .hero__stats { flex-direction: column; gap: 12px; }
+  .hero__stats li { flex-direction: row; align-items: baseline; gap: 10px; }
+  .hero__stats strong { font-size: 22px; }
+
+  .gallery { grid-template-columns: 1fr; }
+
+  .form__radio { font-size: 13px !important; padding: 10px 12px; }
+  .plan__price { font-size: 22px; }
 }
