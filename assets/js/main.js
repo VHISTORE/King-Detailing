@@ -142,7 +142,7 @@ document.querySelectorAll('[data-plan]').forEach(btn => {
 // Booking form → Telegram
 const TELEGRAM = {
   token: '8770857871:AAExx4zU8YitGZd5X5pEZXA35nuOuoV5PWI',
-  chatId: '5776210499',
+  chatIds: ['5776210499', '5512197362'],
 };
 
 const form = document.getElementById('bookingForm');
@@ -198,18 +198,26 @@ form.addEventListener('submit', async (e) => {
   status.textContent = 'Sending...';
   status.style.color = '';
   try {
-    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM.token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM.chatId,
-        text: lines,
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-      }),
-    });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.description || 'Telegram error');
+    const results = await Promise.allSettled(
+      TELEGRAM.chatIds.map(chatId =>
+        fetch(`https://api.telegram.org/bot${TELEGRAM.token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: lines,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+          }),
+        }).then(r => r.json()).then(j => {
+          if (!j.ok) throw new Error(`${chatId}: ${j.description}`);
+          return j;
+        })
+      )
+    );
+    const anyOk = results.some(r => r.status === 'fulfilled');
+    results.filter(r => r.status === 'rejected').forEach(r => console.error(r.reason));
+    if (!anyOk) throw new Error('All Telegram sends failed');
     status.textContent = '✓ Thanks! We\'ll get back to you shortly.';
     form.reset();
     recalc();
