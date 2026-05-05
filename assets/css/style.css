@@ -13,7 +13,8 @@
   --transition: 0.25s ease;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+iframe { max-width: 100%; }
 
 html { scroll-behavior: smooth; }
 
@@ -321,6 +322,7 @@ ul { list-style: none; }
   border: 1px solid var(--border);
   border-radius: 8px;
   transition: border-color var(--transition);
+  word-break: break-word;
 }
 .form__radio:hover { border-color: var(--gold); }
 .form__radio input { accent-color: var(--gold); }
@@ -337,12 +339,14 @@ ul { list-style: none; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 8px 0;
   font-size: 14px;
   color: var(--text-dim);
   border-bottom: 1px dashed rgba(212,160,67,0.2);
+  flex-wrap: wrap;
 }
-.form__total-row strong { color: var(--text); font-weight: 600; }
+.form__total-row strong { color: var(--text); font-weight: 600; word-break: break-word; text-align: right; }
 .form__total-row--final {
   border-bottom: none;
   padding-top: 14px;
@@ -473,6 +477,8 @@ ul { list-style: none; }
   font-family: inherit;
   font-size: 15px;
   transition: border-color var(--transition);
+  width: 100%;
+  max-width: 100%;
 }
 .form input:focus, .form select:focus, .form textarea:focus {
   outline: none;
