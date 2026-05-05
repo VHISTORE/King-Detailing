@@ -48,6 +48,7 @@ const PRICES = {
   standard: { label: 'Standard Valet',  small: 40,  medium: 50,  large: 60  },
   full:     { label: 'Full Valet',      small: 80,  medium: 100, large: 120 },
   deep:     { label: 'Deep Clean',      small: 120, medium: 150, large: 180 },
+  van:      { label: 'Van Wash',        small: 60,  medium: 80,  large: 120 },
   premium:  { label: 'Premium Detail',  small: 200, medium: 275, large: 350 },
 };
 const FLAT_PRICES = {

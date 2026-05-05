@@ -163,6 +163,19 @@
           <a href="#contact" class="btn btn--ghost">Choose</a>
         </article>
         <article class="plan">
+          <h3 class="plan__name">Van Wash</h3>
+          <p class="plan__price">£60 / £80 / £120</p>
+          <p class="plan__tag">Small / medium / large van</p>
+          <ul>
+            <li>Snow foam + hand wash</li>
+            <li>Wheels &amp; arches</li>
+            <li>Sliding doors &amp; rear shut</li>
+            <li>Towel dry</li>
+            <li>Tyre dressing</li>
+          </ul>
+          <a href="#contact" class="btn btn--ghost" data-plan="van">Choose</a>
+        </article>
+        <article class="plan">
           <h3 class="plan__name">Premium Detail</h3>
           <p class="plan__price">£200 – £350+</p>
           <p class="plan__tag">For sale or "like new"</p>
@@ -456,9 +469,9 @@
         <label class="form__full">
           <span>Body type — sets the size category</span>
           <select name="body" id="bodyType">
-            <option value="small">Small — city car / hatchback / coupe (Fiesta, Polo, MINI)</option>
-            <option value="medium" selected>Medium — saloon / estate / small SUV (Focus, A4, Qashqai)</option>
-            <option value="large">Large — SUV / 4x4 / MPV / van (X5, Range Rover, Transporter)</option>
+            <option value="small">Small — hatchback / coupe / small van (Fiesta, Polo, Caddy)</option>
+            <option value="medium" selected>Medium — saloon / estate / mid-size van (Focus, A4, Transit Custom)</option>
+            <option value="large">Large — SUV / 4x4 / MPV / large van (X5, Range Rover, Transporter)</option>
           </select>
         </label>
 
@@ -470,6 +483,7 @@
             <option value="standard" selected>Standard Valet</option>
             <option value="full">Full Valet</option>
             <option value="deep">Deep Clean</option>
+            <option value="van">Van Wash (£60 / £80 / £120)</option>
             <option value="premium">Premium Detail</option>
             <option value="royal">Royal Wash Pass — £450 / year</option>
             <option value="kings">King's Pass — £500 / year</option>
