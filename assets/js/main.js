@@ -167,33 +167,59 @@ form.addEventListener('submit', async (e) => {
   const isMembership = !!FLAT_PRICES[data.service];
 
   const header = isGift
-    ? '🎁 <b>New gift order — King Detailing</b>'
+    ? '🎁 <b>NEW GIFT ORDER</b>'
     : isMembership
-      ? '👑 <b>New membership enquiry — King Detailing</b>'
-      : '🚗 <b>New booking — King Detailing</b>';
+      ? '👑 <b>NEW MEMBERSHIP</b>'
+      : '🚗 <b>NEW BOOKING</b>';
+  const sep = '━━━━━━━━━━━━━━━';
 
-  const lines = [
-    header,
-    '',
-    `<b>From:</b> ${escapeHtml(data.name)}`,
-    `<b>Phone:</b> ${escapeHtml(data.phone)}`,
-    data.email && `<b>Email:</b> ${escapeHtml(data.email)}`,
-    '',
-    !isGift && `<b>Vehicle:</b> ${escapeHtml(data.make || '—')} ${escapeHtml(data.model || '')}`.trim(),
-    !isGift && `<b>Size:</b> ${escapeHtml(sizeLabel)}`,
-    `<b>Service:</b> ${escapeHtml(serviceLabel)}`,
-    !isMembership && !isGift && `<b>Where:</b> ${escapeHtml(locationLabel)}`,
-    data.address && `<b>Address:</b> ${escapeHtml(data.address)}`,
-    data.date && `<b>Preferred date:</b> ${escapeHtml(data.date)}`,
-    data.time && `<b>Preferred time:</b> ${escapeHtml(data.time)}`,
-    `<b>Payment:</b> ${escapeHtml(data.payment)}`,
-    `<b>Estimated total:</b> ${escapeHtml(total)}`,
-    isGift && '\n🎁 <b>Gift recipient</b>',
-    isGift && data.recipient_name && `<b>Name:</b> ${escapeHtml(data.recipient_name)}`,
-    isGift && data.recipient_contact && `<b>Contact:</b> ${escapeHtml(data.recipient_contact)}`,
-    isGift && data.gift_message && `<b>Message:</b>\n${escapeHtml(data.gift_message)}`,
-    data.message && `\n<b>Notes:</b>\n${escapeHtml(data.message)}`,
-  ].filter(Boolean).join('\n');
+  const block = (title, rows) => {
+    const filled = rows.filter(Boolean);
+    if (!filled.length) return null;
+    return [title, ...filled].join('\n');
+  };
+
+  const sections = [
+    `${header}\n<i>King Detailing · Kingsbridge</i>`,
+    sep,
+
+    block('👤 <b>Customer</b>', [
+      `   • Name: ${escapeHtml(data.name)}`,
+      `   • Phone: ${escapeHtml(data.phone)}`,
+      data.email && `   • Email: ${escapeHtml(data.email)}`,
+    ]),
+
+    !isGift && block('🚙 <b>Vehicle</b>', [
+      `   • Make/Model: ${escapeHtml(data.make || '—')} ${escapeHtml(data.model || '')}`.trim(),
+      `   • Size: ${escapeHtml(sizeLabel)}`,
+    ]),
+
+    block(isMembership ? '👑 <b>Plan</b>' : isGift ? '🎁 <b>Gift</b>' : '🧽 <b>Service</b>', [
+      `   • ${escapeHtml(serviceLabel)}`,
+      !isMembership && !isGift && `   • Where: ${escapeHtml(locationLabel)}`,
+      data.address && `   • Address: ${escapeHtml(data.address)}`,
+    ]),
+
+    (data.date || data.time) && block('📅 <b>Schedule</b>', [
+      data.date && `   • Date: ${escapeHtml(data.date)}`,
+      data.time && `   • Time: ${escapeHtml(data.time)}`,
+    ]),
+
+    block('💳 <b>Payment</b>', [
+      `   • Method: ${escapeHtml(data.payment)}`,
+      `   • <b>Total: ${escapeHtml(total)}</b>`,
+    ]),
+
+    isGift && block('🎀 <b>Recipient</b>', [
+      data.recipient_name && `   • Name: ${escapeHtml(data.recipient_name)}`,
+      data.recipient_contact && `   • Contact: ${escapeHtml(data.recipient_contact)}`,
+      data.gift_message && `   • Message: <i>${escapeHtml(data.gift_message)}</i>`,
+    ]),
+
+    data.message && block('💬 <b>Notes</b>', [`   ${escapeHtml(data.message)}`]),
+  ].filter(Boolean);
+
+  const lines = sections.join('\n\n');
 
   status.textContent = 'Sending...';
   status.style.color = '';
