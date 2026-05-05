@@ -52,8 +52,9 @@ const PRICES = {
   premium:  { label: 'Premium Detail',  small: 200, medium: 275, large: 350 },
 };
 const FLAT_PRICES = {
-  royal: { label: 'Royal Wash Pass',  amount: 450, suffix: '/year' },
-  kings: { label: "King's Pass",      amount: 500, suffix: '/year' },
+  royal:  { label: 'Royal Wash Pass',     amount: 450, suffix: '/year' },
+  kings:  { label: "King's Pass",         amount: 500, suffix: '/year' },
+  camper: { label: 'Camper / Motorhome',  range: '£140 – £200', display: 'Quoted on inspection' },
 };
 const QUOTE_LABELS = {
   gift:  'Gift card — amount on request',
@@ -100,10 +101,16 @@ function recalc() {
     els.totalNote.textContent = 'Final price confirmed after a quick inspection.';
   } else if (flat) {
     els.totalService.textContent = flat.label;
-    els.totalBase.textContent = `£${flat.amount} ${flat.suffix}`;
     els.totalAddonRow.hidden = true;
-    els.totalFinal.textContent = `£${flat.amount}`;
-    els.totalNote.textContent = '13 services included. We\'ll confirm your start date and schedule.';
+    if (flat.amount) {
+      els.totalBase.textContent = `£${flat.amount} ${flat.suffix || ''}`.trim();
+      els.totalFinal.textContent = `£${flat.amount}`;
+      els.totalNote.textContent = '13 services included. We\'ll confirm your start date and schedule.';
+    } else {
+      els.totalBase.textContent = flat.range || '—';
+      els.totalFinal.textContent = flat.display || 'Quote on request';
+      els.totalNote.textContent = 'Final price confirmed once we see the vehicle.';
+    }
   } else {
     els.totalService.textContent = QUOTE_LABELS[service] || 'Custom enquiry';
     els.totalBase.textContent = '—';
