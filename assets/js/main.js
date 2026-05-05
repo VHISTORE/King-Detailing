@@ -83,22 +83,69 @@ function recalc() {
 document.querySelectorAll('input[name="location"]').forEach(r => r.addEventListener('change', recalc));
 recalc();
 
-// Booking form submit (placeholder — replace with Formspree endpoint)
+// Booking form → Telegram
+const TELEGRAM = {
+  token: '8770857871:AAExx4zU8YitGZd5X5pEZXA35nuOuoV5PWI',
+  chatId: '5776210499',
+};
+
 const form = document.getElementById('bookingForm');
 const status = document.getElementById('formStatus');
+const escapeHtml = (s = '') => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form));
+  const sizeLabel = SIZE_LABEL[data.body] || data.body;
+  const serviceLabel = (PRICES[data.service] && PRICES[data.service].label)
+    || (data.service === 'fleet' ? 'Fleet / Commercial enquiry' : 'Custom quote');
+  const locationLabel = {
+    studio: 'At our studio',
+    mobile: 'Mobile wash (+£10)',
+    collection: 'Collection & delivery (+£10)',
+  }[data.location] || data.location;
+  const total = document.getElementById('totalFinal').textContent;
+
+  const lines = [
+    '🚗 <b>New booking — King Detailing</b>',
+    '',
+    `<b>Name:</b> ${escapeHtml(data.name)}`,
+    `<b>Phone:</b> ${escapeHtml(data.phone)}`,
+    data.email && `<b>Email:</b> ${escapeHtml(data.email)}`,
+    '',
+    `<b>Vehicle:</b> ${escapeHtml(data.make || '—')} ${escapeHtml(data.model || '')}`.trim(),
+    `<b>Size:</b> ${escapeHtml(sizeLabel)}`,
+    `<b>Service:</b> ${escapeHtml(serviceLabel)}`,
+    `<b>Where:</b> ${escapeHtml(locationLabel)}`,
+    data.address && `<b>Address:</b> ${escapeHtml(data.address)}`,
+    `<b>Payment:</b> ${escapeHtml(data.payment)}`,
+    `<b>Estimated total:</b> ${escapeHtml(total)}`,
+    data.message && `\n<b>Message:</b>\n${escapeHtml(data.message)}`,
+  ].filter(Boolean).join('\n');
+
   status.textContent = 'Sending...';
-  // TODO: replace with real endpoint, e.g. Formspree:
-  // const res = await fetch('https://formspree.io/f/YOUR_ID', { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
-  // if (res.ok) { status.textContent = 'Спасибо! Мы перезвоним в течение 15 минут.'; form.reset(); }
-  // else status.textContent = 'Ошибка отправки. Позвоните нам напрямую.';
-  console.log('Заявка:', data);
-  setTimeout(() => {
-    status.textContent = 'Thanks! We\'ll get back to you shortly.';
+  status.style.color = '';
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM.token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM.chatId,
+        text: lines,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.description || 'Telegram error');
+    status.textContent = '✓ Thanks! We\'ll get back to you shortly.';
     form.reset();
-  }, 600);
+    recalc();
+  } catch (err) {
+    console.error(err);
+    status.style.color = '#ff6b6b';
+    status.textContent = 'Could not send — please call us on +44 1548 000 000.';
+  }
 });
 
 // Scroll reveal
