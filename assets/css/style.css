@@ -212,11 +212,35 @@ ul { list-style: none; }
   text-transform: uppercase;
 }
 .plan__name { font-family: 'Cinzel', serif; font-size: 26px; margin-bottom: 8px; }
-.plan__price { font-size: 32px; color: var(--gold); font-weight: 700; margin-bottom: 28px; }
+.plan__price { font-size: 28px; color: var(--gold); font-weight: 700; margin-bottom: 6px; }
+.plan__tag { font-size: 13px; color: var(--text-dim); font-style: italic; margin-bottom: 24px; }
 .plan ul { margin-bottom: 32px; flex: 1; }
 .plan li { padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text-dim); font-size: 15px; }
 .plan li:last-child { border-bottom: none; }
 .pricing__note { color: var(--text-dim); font-size: 14px; text-align: center; }
+
+/* === Add-ons === */
+.addons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+.addon {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+.addon:hover { border-color: var(--gold); transform: translateY(-3px); }
+.addon h3 { font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold); margin-bottom: 6px; }
+.addon__price { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 18px; }
+.addon ul { margin-bottom: 18px; flex: 1; }
+.addon ul li { padding: 6px 0; color: var(--text-dim); font-size: 14px; border-bottom: 1px dashed var(--border); }
+.addon ul li:last-child { border-bottom: none; }
+.addon__hook { font-style: italic; color: var(--gold-light); font-size: 14px; }
 
 /* === Gallery === */
 .gallery {

@@ -21,6 +21,7 @@
       <nav class="nav" id="nav">
         <a href="#services">Services</a>
         <a href="#pricing">Pricing</a>
+        <a href="#addons">Add-ons</a>
         <a href="#gallery">Gallery</a>
         <a href="#about">About</a>
         <a href="#reviews">Reviews</a>
@@ -95,43 +96,127 @@
       <div class="pricing">
         <article class="plan">
           <h3 class="plan__name">Basic Wash</h3>
-          <p class="plan__price">from £35</p>
+          <p class="plan__price">£20 – £30</p>
+          <p class="plan__tag">Just freshen it up</p>
           <ul>
-            <li>Snow foam pre-wash</li>
-            <li>Two-bucket hand wash</li>
-            <li>Wheels & tyre dressing</li>
-            <li>Glass cleaned inside & out</li>
-            <li>Quick interior vacuum</li>
+            <li>Snow foam + hand wash</li>
+            <li>Wheel cleaning</li>
+            <li>Towel dry</li>
+            <li>Quick glass wipe down</li>
+          </ul>
+          <a href="#contact" class="btn btn--ghost">Choose</a>
+        </article>
+        <article class="plan">
+          <h3 class="plan__name">Standard Valet</h3>
+          <p class="plan__price">£40 – £60</p>
+          <p class="plan__tag">Most popular</p>
+          <ul>
+            <li>Everything in Basic</li>
+            <li>Interior vacuum</li>
+            <li>Plastics wiped down</li>
+            <li>Interior glass cleaned</li>
+            <li>Tyre dressing</li>
           </ul>
           <a href="#contact" class="btn btn--ghost">Choose</a>
         </article>
         <article class="plan plan--featured">
-          <span class="plan__badge">Most popular</span>
-          <h3 class="plan__name">Premium Detail</h3>
-          <p class="plan__price">from £120</p>
+          <span class="plan__badge">Best value</span>
+          <h3 class="plan__name">Full Valet</h3>
+          <p class="plan__price">£80 – £120</p>
+          <p class="plan__tag">The wow effect</p>
           <ul>
-            <li>Everything in Basic</li>
-            <li>Iron fallout & tar decon</li>
-            <li>Machine polish (one-stage)</li>
-            <li>6-month sealant</li>
-            <li>Full interior valet</li>
+            <li>Everything in Standard</li>
+            <li>Deep exterior wash</li>
+            <li>Tough contamination removed</li>
+            <li>Interior wet clean</li>
+            <li>Light seat clean</li>
           </ul>
           <a href="#contact" class="btn btn--gold">Choose</a>
         </article>
         <article class="plan">
-          <h3 class="plan__name">King Treatment</h3>
-          <p class="plan__price">from £450</p>
+          <h3 class="plan__name">Deep Clean</h3>
+          <p class="plan__price">£120 – £180</p>
+          <p class="plan__tag">For heavily soiled cars</p>
           <ul>
-            <li>Everything in Premium</li>
-            <li>Full paint correction</li>
-            <li>Ceramic coating (3–5 yr)</li>
-            <li>Deep interior detail</li>
-            <li>12-month warranty</li>
+            <li>Everything in Full Valet</li>
+            <li>Seat shampoo / extraction</li>
+            <li>Carpet deep clean</li>
+            <li>Headliner cleaning</li>
+            <li>Odour removal</li>
+          </ul>
+          <a href="#contact" class="btn btn--ghost">Choose</a>
+        </article>
+        <article class="plan">
+          <h3 class="plan__name">Premium Detail</h3>
+          <p class="plan__price">£200 – £350+</p>
+          <p class="plan__tag">For sale or "like new"</p>
+          <ul>
+            <li>Full detailing wash</li>
+            <li>Decontamination (tar, iron, clay)</li>
+            <li>One-stage machine polish</li>
+            <li>Wax / sealant protection</li>
+            <li>Detailed interior work</li>
           </ul>
           <a href="#contact" class="btn btn--ghost">Choose</a>
         </article>
       </div>
       <p class="pricing__note">Final price depends on the size and condition of your vehicle. We'll quote you exactly after a quick inspection.</p>
+    </div>
+  </section>
+
+  <section class="section" id="addons">
+    <div class="container">
+      <p class="section__eyebrow">Add-ons</p>
+      <h2 class="section__title">Extra services</h2>
+      <div class="addons">
+        <article class="addon">
+          <h3>Pre-Sale Detail</h3>
+          <p class="addon__price">£150 – £300</p>
+          <ul>
+            <li>Deep exterior wash</li>
+            <li>Full interior clean</li>
+            <li>Stain & odour removal</li>
+            <li>Plastic restoration</li>
+            <li>Polish if needed</li>
+            <li>Photo-ready finish</li>
+          </ul>
+          <p class="addon__hook">Looks more expensive — sells faster.</p>
+        </article>
+
+        <article class="addon">
+          <h3>Enhancement Polish</h3>
+          <p class="addon__price">£80 – £150</p>
+          <ul>
+            <li>Removes light scratches</li>
+            <li>Restores gloss</li>
+            <li>Refreshes the clear coat</li>
+          </ul>
+          <p class="addon__hook">Quick visual upgrade.</p>
+        </article>
+
+        <article class="addon">
+          <h3>Multi-stage Correction</h3>
+          <p class="addon__price">£180 – £350+</p>
+          <ul>
+            <li>Removes scratches & swirl marks</li>
+            <li>Levels the clear coat</li>
+            <li>Maximum gloss & depth</li>
+          </ul>
+          <p class="addon__hook">Almost like new paintwork.</p>
+        </article>
+
+        <article class="addon">
+          <h3>Wheel Restoration</h3>
+          <p class="addon__price">£60 – £120 / set · from £25 / wheel</p>
+          <ul>
+            <li>Deep clean</li>
+            <li>Brake dust & build-up removed</li>
+            <li>Colour refreshed</li>
+            <li>Protective coating</li>
+          </ul>
+          <p class="addon__hook">Massive visual difference.</p>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -234,13 +319,15 @@
         <label>
           <span>Service</span>
           <select name="service">
-            <option>Hand Wash</option>
-            <option>Paint Correction</option>
-            <option>Ceramic Coating</option>
-            <option>Interior Valet</option>
-            <option>Basic Wash package</option>
-            <option>Premium Detail package</option>
-            <option>King Treatment package</option>
+            <option>Basic Wash (£20–£30)</option>
+            <option>Standard Valet (£40–£60)</option>
+            <option>Full Valet (£80–£120)</option>
+            <option>Deep Clean (£120–£180)</option>
+            <option>Premium Detail (£200–£350+)</option>
+            <option>Pre-Sale Detail</option>
+            <option>Enhancement Polish</option>
+            <option>Multi-stage Correction</option>
+            <option>Wheel Restoration</option>
             <option>Other / not sure</option>
           </select>
         </label>
