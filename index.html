@@ -384,28 +384,39 @@
           <span>Email</span>
           <input type="email" name="email" placeholder="you@example.com" />
         </label>
+
         <label>
-          <span>Vehicle</span>
-          <input type="text" name="car" placeholder="BMW X5, 2022" />
+          <span>Make</span>
+          <input type="text" name="make" placeholder="BMW" />
         </label>
         <label>
-          <span>Service</span>
-          <select name="service">
-            <option>Express Wash (from £15)</option>
-            <option>Basic Wash (£20–£30)</option>
-            <option>Standard Valet (£40–£60)</option>
-            <option>Full Valet (£80–£120)</option>
-            <option>Deep Clean (£120–£180)</option>
-            <option>Premium Detail (£200–£350+)</option>
-            <option>Pre-Sale Detail</option>
-            <option>Enhancement Polish</option>
-            <option>Multi-stage Correction</option>
-            <option>Life Shine / Ceramic Protection (£60/£80/£120)</option>
-            <option>Wheel Restoration</option>
-            <option>Fleet / Commercial enquiry</option>
-            <option>Other / not sure</option>
+          <span>Model &amp; year</span>
+          <input type="text" name="model" placeholder="X5, 2022" />
+        </label>
+
+        <label class="form__full">
+          <span>Body type — sets the size category</span>
+          <select name="body" id="bodyType">
+            <option value="small">Small — city car / hatchback / coupe (Fiesta, Polo, MINI)</option>
+            <option value="medium" selected>Medium — saloon / estate / small SUV (Focus, A4, Qashqai)</option>
+            <option value="large">Large — SUV / 4x4 / MPV / van (X5, Range Rover, Transporter)</option>
           </select>
         </label>
+
+        <label class="form__full">
+          <span>Service</span>
+          <select name="service" id="serviceSelect">
+            <option value="express">Express Wash</option>
+            <option value="basic">Basic Wash</option>
+            <option value="standard" selected>Standard Valet</option>
+            <option value="full">Full Valet</option>
+            <option value="deep">Deep Clean</option>
+            <option value="premium">Premium Detail</option>
+            <option value="quote">Add-on / detailing — quote on inspection</option>
+            <option value="fleet">Fleet / Commercial enquiry</option>
+          </select>
+        </label>
+
         <label class="form__full">
           <span>Where?</span>
           <div class="form__radios">
@@ -414,6 +425,7 @@
             <label class="form__radio"><input type="radio" name="location" value="collection" /> Collection &amp; delivery (+£10)</label>
           </div>
         </label>
+
         <label>
           <span>Payment method</span>
           <select name="payment">
@@ -426,10 +438,28 @@
           <span>Address (if mobile / collection)</span>
           <input type="text" name="address" placeholder="Postcode is enough" />
         </label>
+
         <label class="form__full">
           <span>Message</span>
           <textarea name="message" rows="3" placeholder="Anything we should know about your car"></textarea>
         </label>
+
+        <div class="form__total form__full" id="formTotal">
+          <div class="form__total-row">
+            <span>Service</span><strong id="totalService">Standard Valet · Medium</strong>
+          </div>
+          <div class="form__total-row">
+            <span>Base price</span><strong id="totalBase">£50</strong>
+          </div>
+          <div class="form__total-row" id="totalAddonRow" hidden>
+            <span id="totalAddonLabel">Mobile (+£10)</span><strong id="totalAddon">£10</strong>
+          </div>
+          <div class="form__total-row form__total-row--final">
+            <span>Estimated total</span><strong id="totalFinal">£50</strong>
+          </div>
+          <p class="form__total-note" id="totalNote">Final price confirmed after a quick inspection.</p>
+        </div>
+
         <button type="submit" class="btn btn--gold form__submit">Send enquiry</button>
         <p class="form__status" id="formStatus"></p>
       </form>
