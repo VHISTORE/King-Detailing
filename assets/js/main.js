@@ -4,8 +4,20 @@ document.getElementById('year').textContent = new Date().getFullYear();
 // Mobile menu
 const burger = document.getElementById('burger');
 const nav = document.getElementById('nav');
-burger.addEventListener('click', () => nav.classList.toggle('open'));
-nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+const backdrop = document.getElementById('navBackdrop');
+
+const setMenu = (open) => {
+  nav.classList.toggle('open', open);
+  burger.classList.toggle('open', open);
+  backdrop.classList.toggle('open', open);
+  burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  document.body.classList.toggle('nav-locked', open);
+};
+
+burger.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+backdrop.addEventListener('click', () => setMenu(false));
+nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
 
 // UK phone formatting (light touch — accept 07xxx and +44 forms)
 const phoneInput = document.querySelector('input[name="phone"]');
