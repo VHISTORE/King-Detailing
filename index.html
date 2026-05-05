@@ -22,6 +22,8 @@
         <a href="#services">Services</a>
         <a href="#pricing">Pricing</a>
         <a href="#addons">Add-ons</a>
+        <a href="#mobile">Mobile</a>
+        <a href="#business">Fleet</a>
         <a href="#gallery">Gallery</a>
         <a href="#about">About</a>
         <a href="#reviews">Reviews</a>
@@ -94,6 +96,17 @@
       <p class="section__eyebrow">Pricing</p>
       <h2 class="section__title">Detailing packages</h2>
       <div class="pricing">
+        <article class="plan">
+          <h3 class="plan__name">Express Wash</h3>
+          <p class="plan__price">from £15</p>
+          <p class="plan__tag">Quick refresh</p>
+          <ul>
+            <li>Bodywork wash</li>
+            <li>Door shuts &amp; arches</li>
+            <li>Wheels rinse</li>
+          </ul>
+          <a href="#contact" class="btn btn--ghost">Choose</a>
+        </article>
         <article class="plan">
           <h3 class="plan__name">Basic Wash</h3>
           <p class="plan__price">£20 – £30</p>
@@ -220,6 +233,53 @@
     </div>
   </section>
 
+  <section class="section section--alt" id="mobile">
+    <div class="container">
+      <p class="section__eyebrow">We come to you</p>
+      <h2 class="section__title">Mobile wash &amp; Collection service</h2>
+      <p class="mobile__lead">Don't waste your weekend at the wash. We bring the studio to your driveway — or pick the car up, valet it, and bring it back.</p>
+      <div class="mobile">
+        <article class="mobile__card">
+          <div class="mobile__icon">🚐</div>
+          <h3>Mobile Wash</h3>
+          <p>Our van rolls up to your home or office with water, power and full kit. Any package on the menu, done on your driveway while you carry on with your day.</p>
+          <p class="mobile__fee">+£10 to any service · any location around Kingsbridge</p>
+        </article>
+        <article class="mobile__card">
+          <div class="mobile__icon">🔑</div>
+          <h3>Collection &amp; Delivery</h3>
+          <p>A fully insured professional driver picks your car up from your home, brings it to our unit for the full detail, and returns it to your parking spot — keys back in your hand.</p>
+          <p class="mobile__fee">+£10 to any service · fully insured driver</p>
+        </article>
+      </div>
+      <p class="mobile__note">Tell us which option you want when you book — pay in cash, by card on arrival, or online via PayPal.</p>
+    </div>
+  </section>
+
+  <section class="section" id="business">
+    <div class="container business">
+      <div class="business__text">
+        <p class="section__eyebrow">For business</p>
+        <h2 class="section__title">Fleet &amp; commercial valeting</h2>
+        <p>Run a taxi firm, hire fleet, dealership or company cars? We offer scheduled valeting at preferential rates with monthly invoicing and priority slots.</p>
+        <ul class="business__list">
+          <li>✓ Volume discounts from 5+ vehicles</li>
+          <li>✓ Weekly or monthly schedules</li>
+          <li>✓ On-site service at your depot</li>
+          <li>✓ Single monthly invoice — VAT receipt</li>
+          <li>✓ Priority booking slots</li>
+        </ul>
+        <a href="#contact" class="btn btn--gold">Request a quote</a>
+      </div>
+      <div class="business__stats">
+        <div><strong>20%+</strong><span>fleet discount</span></div>
+        <div><strong>24h</strong><span>turnaround</span></div>
+        <div><strong>VAT</strong><span>invoicing</span></div>
+        <div><strong>5+</strong><span>cars / contract</span></div>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="gallery">
     <div class="container">
       <p class="section__eyebrow">Our work</p>
@@ -319,6 +379,7 @@
         <label>
           <span>Service</span>
           <select name="service">
+            <option>Express Wash (from £15)</option>
             <option>Basic Wash (£20–£30)</option>
             <option>Standard Valet (£40–£60)</option>
             <option>Full Valet (£80–£120)</option>
@@ -328,8 +389,29 @@
             <option>Enhancement Polish</option>
             <option>Multi-stage Correction</option>
             <option>Wheel Restoration</option>
+            <option>Fleet / Commercial enquiry</option>
             <option>Other / not sure</option>
           </select>
+        </label>
+        <label class="form__full">
+          <span>Where?</span>
+          <div class="form__radios">
+            <label class="form__radio"><input type="radio" name="location" value="studio" checked /> At our studio</label>
+            <label class="form__radio"><input type="radio" name="location" value="mobile" /> Mobile wash at my address (+£10)</label>
+            <label class="form__radio"><input type="radio" name="location" value="collection" /> Collection &amp; delivery (+£10)</label>
+          </div>
+        </label>
+        <label>
+          <span>Payment method</span>
+          <select name="payment">
+            <option>Pay on arrival — cash</option>
+            <option>Pay on arrival — card</option>
+            <option>Pay now — PayPal</option>
+          </select>
+        </label>
+        <label>
+          <span>Address (if mobile / collection)</span>
+          <input type="text" name="address" placeholder="Postcode is enough" />
         </label>
         <label class="form__full">
           <span>Message</span>

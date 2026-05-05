@@ -52,7 +52,7 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.12 });
 
-document.querySelectorAll('.service, .plan, .addon, .review, .gallery__item').forEach(el => {
+document.querySelectorAll('.service, .plan, .addon, .mobile__card, .business__stats > div, .review, .gallery__item').forEach(el => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(24px)';
   el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
