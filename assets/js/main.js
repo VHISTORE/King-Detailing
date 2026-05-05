@@ -142,8 +142,41 @@ document.querySelectorAll('[data-plan]').forEach(btn => {
 // Booking form → Telegram
 const TELEGRAM = {
   token: '8770857871:AAExx4zU8YitGZd5X5pEZXA35nuOuoV5PWI',
-  chatIds: ['5776210499', '5512197362'],
+  // Anyone who has ever written to the bot. Discovered dynamically via getUpdates
+  // and persisted in localStorage so the list survives Telegram's 24h update window.
+  seedChatIds: ['5776210499', '5512197362'],
+  storageKey: 'kd_chat_ids_v1',
 };
+
+function loadChatIds() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(TELEGRAM.storageKey) || '[]');
+    return new Set([...TELEGRAM.seedChatIds, ...stored]);
+  } catch {
+    return new Set(TELEGRAM.seedChatIds);
+  }
+}
+function saveChatIds(set) {
+  try { localStorage.setItem(TELEGRAM.storageKey, JSON.stringify([...set])); } catch {}
+}
+
+async function discoverChatIds() {
+  const ids = loadChatIds();
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM.token}/getUpdates`);
+    const json = await res.json();
+    if (json.ok && Array.isArray(json.result)) {
+      json.result.forEach(u => {
+        const chat = u.message?.chat || u.edited_message?.chat || u.callback_query?.message?.chat;
+        if (chat && chat.type === 'private' && chat.id) ids.add(String(chat.id));
+      });
+      saveChatIds(ids);
+    }
+  } catch (e) {
+    console.warn('getUpdates failed, using cached list:', e);
+  }
+  return [...ids];
+}
 
 const form = document.getElementById('bookingForm');
 const status = document.getElementById('formStatus');
@@ -216,8 +249,9 @@ function buildBookingMessage(statusOverride) {
 }
 
 async function sendToTelegram(text) {
+  const chatIds = await discoverChatIds();
   const results = await Promise.allSettled(
-    TELEGRAM.chatIds.map(chatId =>
+    chatIds.map(chatId =>
       fetch(`https://api.telegram.org/bot${TELEGRAM.token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
