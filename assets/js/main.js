@@ -50,6 +50,15 @@ const PRICES = {
   deep:     { label: 'Deep Clean',      small: 120, medium: 150, large: 180 },
   premium:  { label: 'Premium Detail',  small: 200, medium: 275, large: 350 },
 };
+const FLAT_PRICES = {
+  royal: { label: 'Royal Wash Pass',  amount: 450, suffix: '/year' },
+  kings: { label: "King's Pass",      amount: 500, suffix: '/year' },
+};
+const QUOTE_LABELS = {
+  gift:  'Gift card — amount on request',
+  quote: 'Custom quote',
+  fleet: 'Fleet enquiry',
+};
 const SIZE_LABEL = { small: 'Small', medium: 'Medium', large: 'Large' };
 const LOCATION_FEE = { studio: 0, mobile: 10, collection: 10 };
 const LOCATION_LABEL = { mobile: 'Mobile (+£10)', collection: 'Collection & delivery (+£10)' };
@@ -73,6 +82,8 @@ function recalc() {
   const fee = LOCATION_FEE[location] || 0;
 
   const priced = PRICES[service];
+  const flat = FLAT_PRICES[service];
+
   if (priced) {
     const base = priced[size];
     els.totalService.textContent = `${priced.label} · ${SIZE_LABEL[size]}`;
@@ -86,10 +97,14 @@ function recalc() {
     }
     els.totalFinal.textContent = `£${base + fee}`;
     els.totalNote.textContent = 'Final price confirmed after a quick inspection.';
+  } else if (flat) {
+    els.totalService.textContent = flat.label;
+    els.totalBase.textContent = `£${flat.amount} ${flat.suffix}`;
+    els.totalAddonRow.hidden = true;
+    els.totalFinal.textContent = `£${flat.amount}`;
+    els.totalNote.textContent = '13 services included. We\'ll confirm your start date and schedule.';
   } else {
-    // quote / fleet — no auto price
-    const labelMap = { quote: 'Custom quote', fleet: 'Fleet enquiry' };
-    els.totalService.textContent = `${labelMap[service]} · ${SIZE_LABEL[size]}`;
+    els.totalService.textContent = QUOTE_LABELS[service] || 'Custom enquiry';
     els.totalBase.textContent = '—';
     els.totalAddonRow.hidden = true;
     els.totalFinal.textContent = 'Quote on request';
@@ -100,6 +115,29 @@ function recalc() {
 [els.body, els.service].forEach(el => el.addEventListener('change', recalc));
 document.querySelectorAll('input[name="location"]').forEach(r => r.addEventListener('change', recalc));
 recalc();
+
+// Min date = today
+const dateInput = document.getElementById('bookingDate');
+if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
+
+// Gift toggle
+const giftToggle = document.getElementById('giftToggle');
+const giftFields = document.getElementById('giftFields');
+giftToggle.addEventListener('change', () => { giftFields.hidden = !giftToggle.checked; });
+
+// Membership / gift CTA buttons preselect form values
+document.querySelectorAll('[data-plan]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const plan = btn.dataset.plan;
+    const isGift = btn.dataset.gift === '1';
+    if (plan) {
+      els.service.value = plan;
+      els.service.dispatchEvent(new Event('change'));
+    }
+    giftToggle.checked = isGift;
+    giftFields.hidden = !isGift;
+  });
+});
 
 // Booking form → Telegram
 const TELEGRAM = {
@@ -116,29 +154,45 @@ form.addEventListener('submit', async (e) => {
   const data = Object.fromEntries(new FormData(form));
   const sizeLabel = SIZE_LABEL[data.body] || data.body;
   const serviceLabel = (PRICES[data.service] && PRICES[data.service].label)
-    || (data.service === 'fleet' ? 'Fleet / Commercial enquiry' : 'Custom quote');
+    || (FLAT_PRICES[data.service] && FLAT_PRICES[data.service].label)
+    || QUOTE_LABELS[data.service]
+    || 'Custom enquiry';
   const locationLabel = {
     studio: 'At our studio',
     mobile: 'Mobile wash (+£10)',
     collection: 'Collection & delivery (+£10)',
   }[data.location] || data.location;
   const total = document.getElementById('totalFinal').textContent;
+  const isGift = data.gift === 'on';
+  const isMembership = !!FLAT_PRICES[data.service];
+
+  const header = isGift
+    ? '🎁 <b>New gift order — King Detailing</b>'
+    : isMembership
+      ? '👑 <b>New membership enquiry — King Detailing</b>'
+      : '🚗 <b>New booking — King Detailing</b>';
 
   const lines = [
-    '🚗 <b>New booking — King Detailing</b>',
+    header,
     '',
-    `<b>Name:</b> ${escapeHtml(data.name)}`,
+    `<b>From:</b> ${escapeHtml(data.name)}`,
     `<b>Phone:</b> ${escapeHtml(data.phone)}`,
     data.email && `<b>Email:</b> ${escapeHtml(data.email)}`,
     '',
-    `<b>Vehicle:</b> ${escapeHtml(data.make || '—')} ${escapeHtml(data.model || '')}`.trim(),
-    `<b>Size:</b> ${escapeHtml(sizeLabel)}`,
+    !isGift && `<b>Vehicle:</b> ${escapeHtml(data.make || '—')} ${escapeHtml(data.model || '')}`.trim(),
+    !isGift && `<b>Size:</b> ${escapeHtml(sizeLabel)}`,
     `<b>Service:</b> ${escapeHtml(serviceLabel)}`,
-    `<b>Where:</b> ${escapeHtml(locationLabel)}`,
+    !isMembership && !isGift && `<b>Where:</b> ${escapeHtml(locationLabel)}`,
     data.address && `<b>Address:</b> ${escapeHtml(data.address)}`,
+    data.date && `<b>Preferred date:</b> ${escapeHtml(data.date)}`,
+    data.time && `<b>Preferred time:</b> ${escapeHtml(data.time)}`,
     `<b>Payment:</b> ${escapeHtml(data.payment)}`,
     `<b>Estimated total:</b> ${escapeHtml(total)}`,
-    data.message && `\n<b>Message:</b>\n${escapeHtml(data.message)}`,
+    isGift && '\n🎁 <b>Gift recipient</b>',
+    isGift && data.recipient_name && `<b>Name:</b> ${escapeHtml(data.recipient_name)}`,
+    isGift && data.recipient_contact && `<b>Contact:</b> ${escapeHtml(data.recipient_contact)}`,
+    isGift && data.gift_message && `<b>Message:</b>\n${escapeHtml(data.gift_message)}`,
+    data.message && `\n<b>Notes:</b>\n${escapeHtml(data.message)}`,
   ].filter(Boolean).join('\n');
 
   status.textContent = 'Sending...';

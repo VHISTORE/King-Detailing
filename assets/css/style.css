@@ -273,6 +273,67 @@ ul { list-style: none; }
 .addon ul li:last-child { border-bottom: none; }
 .addon__hook { font-style: italic; color: var(--gold-light); font-size: 14px; }
 
+/* === Memberships === */
+.memberships__lead { color: var(--text-dim); max-width: 720px; margin-bottom: 40px; font-size: 17px; }
+.memberships {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+.membership {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition);
+}
+.membership:hover { border-color: var(--gold); transform: translateY(-3px); }
+.membership--featured {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(212,160,67,0.10), var(--bg-card) 60%);
+}
+.membership--gift {
+  background: linear-gradient(180deg, rgba(212,160,67,0.06), var(--bg-card) 80%);
+  border-style: dashed;
+}
+.membership__badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: #1a1a1a;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.membership__icon { font-size: 36px; margin-bottom: 12px; }
+.membership__name { font-family: 'Cinzel', serif; font-size: 24px; color: var(--gold); margin-bottom: 6px; }
+.membership__price { font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.membership__price span { font-size: 16px; color: var(--text-dim); font-weight: 400; }
+.membership__tag { font-size: 13px; color: var(--text-dim); font-style: italic; margin-bottom: 22px; }
+.membership ul { margin-bottom: 24px; flex: 1; }
+.membership ul li { padding: 8px 0; color: var(--text-dim); font-size: 14px; border-bottom: 1px dashed var(--border); }
+.membership ul li:last-child { border-bottom: none; }
+.membership__cta { width: 100%; }
+.membership__gift {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--gold-light);
+  border-bottom: 1px dashed var(--gold-dark);
+  padding-bottom: 4px;
+  align-self: center;
+}
+.membership__gift:hover { color: var(--gold); }
+
 /* === Mobile / Collection === */
 .mobile__lead { color: var(--text-dim); max-width: 720px; margin-bottom: 40px; font-size: 17px; }
 .mobile {
@@ -355,6 +416,34 @@ ul { list-style: none; }
 }
 .form__radio:hover { border-color: var(--gold); }
 .form__radio input { accent-color: var(--gold); }
+
+/* Gift toggle + gift fields */
+.form__check {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(212, 160, 67, 0.06);
+  border: 1px dashed var(--gold-dark);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px !important;
+  color: var(--text) !important;
+}
+.form__check input { accent-color: var(--gold); width: 18px; height: 18px; }
+
+.form__gift {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 18px;
+  background: rgba(212, 160, 67, 0.04);
+  border: 1px solid var(--gold-dark);
+  border-radius: var(--radius);
+}
+.form__gift .form__full { grid-column: 1 / -1; }
+@media (max-width: 600px) { .form__gift { grid-template-columns: 1fr; } }
 
 /* Booking total summary */
 .form__total {
