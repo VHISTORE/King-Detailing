@@ -498,6 +498,21 @@ ul { list-style: none; }
 .footer p { color: var(--text-dim); font-size: 14px; }
 .footer__nav { display: flex; gap: 24px; }
 .footer__nav a { font-size: 14px; color: var(--text-dim); }
+.footer__socials { display: flex; gap: 10px; }
+.footer__socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.3px;
+  transition: all var(--transition);
+}
+.footer__socials a:hover { background: var(--gold); color: #1a1a1a; }
 
 /* === Responsive === */
 @media (max-width: 900px) {
