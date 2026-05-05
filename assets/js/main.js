@@ -149,8 +149,7 @@ const form = document.getElementById('bookingForm');
 const status = document.getElementById('formStatus');
 const escapeHtml = (s = '') => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+function buildBookingMessage(statusOverride) {
   const data = Object.fromEntries(new FormData(form));
   const sizeLabel = SIZE_LABEL[data.body] || data.body;
   const serviceLabel = (PRICES[data.service] && PRICES[data.service].label)
@@ -166,11 +165,12 @@ form.addEventListener('submit', async (e) => {
   const isGift = data.gift === 'on';
   const isMembership = !!FLAT_PRICES[data.service];
 
-  const header = isGift
+  const defaultHeader = isGift
     ? '🎁 <b>NEW GIFT ORDER</b>'
     : isMembership
       ? '👑 <b>NEW MEMBERSHIP</b>'
       : '🚗 <b>NEW BOOKING</b>';
+  const header = statusOverride || defaultHeader;
   const sep = '━━━━━━━━━━━━━━━';
 
   const block = (title, rows) => {
@@ -182,68 +182,68 @@ form.addEventListener('submit', async (e) => {
   const sections = [
     `${header}\n<i>King Detailing · Kingsbridge</i>`,
     sep,
-
     block('👤 <b>Customer</b>', [
       `   • Name: ${escapeHtml(data.name)}`,
       `   • Phone: ${escapeHtml(data.phone)}`,
       data.email && `   • Email: ${escapeHtml(data.email)}`,
     ]),
-
     !isGift && block('🚙 <b>Vehicle</b>', [
       `   • Make/Model: ${escapeHtml(data.make || '—')} ${escapeHtml(data.model || '')}`.trim(),
       `   • Size: ${escapeHtml(sizeLabel)}`,
     ]),
-
     block(isMembership ? '👑 <b>Plan</b>' : isGift ? '🎁 <b>Gift</b>' : '🧽 <b>Service</b>', [
       `   • ${escapeHtml(serviceLabel)}`,
       !isMembership && !isGift && `   • Where: ${escapeHtml(locationLabel)}`,
       data.address && `   • Address: ${escapeHtml(data.address)}`,
     ]),
-
     (data.date || data.time) && block('📅 <b>Schedule</b>', [
       data.date && `   • Date: ${escapeHtml(data.date)}`,
       data.time && `   • Time: ${escapeHtml(data.time)}`,
     ]),
-
     block('💳 <b>Payment</b>', [
       `   • Method: ${escapeHtml(data.payment)}`,
       `   • <b>Total: ${escapeHtml(total)}</b>`,
     ]),
-
     isGift && block('🎀 <b>Recipient</b>', [
       data.recipient_name && `   • Name: ${escapeHtml(data.recipient_name)}`,
       data.recipient_contact && `   • Contact: ${escapeHtml(data.recipient_contact)}`,
       data.gift_message && `   • Message: <i>${escapeHtml(data.gift_message)}</i>`,
     ]),
-
     data.message && block('💬 <b>Notes</b>', [`   ${escapeHtml(data.message)}`]),
   ].filter(Boolean);
 
-  const lines = sections.join('\n\n');
+  return sections.join('\n\n');
+}
 
-  status.textContent = 'Sending...';
+async function sendToTelegram(text) {
+  const results = await Promise.allSettled(
+    TELEGRAM.chatIds.map(chatId =>
+      fetch(`https://api.telegram.org/bot${TELEGRAM.token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true,
+        }),
+      }).then(r => r.json()).then(j => {
+        if (!j.ok) throw new Error(`${chatId}: ${j.description}`);
+        return j;
+      })
+    )
+  );
+  results.filter(r => r.status === 'rejected').forEach(r => console.error(r.reason));
+  return results.some(r => r.status === 'fulfilled');
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
   status.style.color = '';
+  status.textContent = 'Sending...';
   try {
-    const results = await Promise.allSettled(
-      TELEGRAM.chatIds.map(chatId =>
-        fetch(`https://api.telegram.org/bot${TELEGRAM.token}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: lines,
-            parse_mode: 'HTML',
-            disable_web_page_preview: true,
-          }),
-        }).then(r => r.json()).then(j => {
-          if (!j.ok) throw new Error(`${chatId}: ${j.description}`);
-          return j;
-        })
-      )
-    );
-    const anyOk = results.some(r => r.status === 'fulfilled');
-    results.filter(r => r.status === 'rejected').forEach(r => console.error(r.reason));
-    if (!anyOk) throw new Error('All Telegram sends failed');
+    const ok = await sendToTelegram(buildBookingMessage());
+    if (!ok) throw new Error('All Telegram sends failed');
     status.textContent = '✓ Thanks! We\'ll get back to you shortly.';
     form.reset();
     recalc();
@@ -253,6 +253,65 @@ form.addEventListener('submit', async (e) => {
     status.textContent = 'Could not send — please call us on +44 1548 000 000.';
   }
 });
+
+// === PayPal ===
+const paymentSelect = document.querySelector('select[name="payment"]');
+const paypalContainer = document.getElementById('paypalContainer');
+const mainSubmit = document.getElementById('mainSubmit');
+
+function getNumericTotal() {
+  const t = document.getElementById('totalFinal').textContent;
+  const m = t.match(/£\s*(\d+(?:\.\d+)?)/);
+  return m ? parseFloat(m[1]) : null;
+}
+
+let paypalRendered = false;
+function initPayPalButtons() {
+  if (paypalRendered || !window.paypal) return;
+  paypalRendered = true;
+  paypal.Buttons({
+    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
+    createOrder: (data, actions) => {
+      const amount = getNumericTotal();
+      if (!amount) {
+        status.style.color = '#ff6b6b';
+        status.textContent = 'This service needs a manual quote — please choose another payment method.';
+        return Promise.reject('No numeric total');
+      }
+      return actions.order.create({
+        purchase_units: [{ amount: { value: amount.toFixed(2), currency_code: 'GBP' } }],
+      });
+    },
+    onApprove: (data, actions) => actions.order.capture().then(async () => {
+      status.style.color = '';
+      status.textContent = 'Payment received — sending confirmation...';
+      const ok = await sendToTelegram(buildBookingMessage('💳 <b>PAID ORDER ✅</b>'));
+      if (ok) {
+        status.textContent = '✓ Payment received! We\'ll be in touch shortly.';
+        form.reset();
+        recalc();
+        togglePaypal('cash');
+        paymentSelect.value = 'Pay on arrival — cash';
+      } else {
+        status.textContent = '✓ Payment received! (Could not auto-notify — we\'ll follow up by email.)';
+      }
+    }),
+    onError: (err) => {
+      console.error('PayPal error:', err);
+      status.style.color = '#ff6b6b';
+      status.textContent = 'Payment failed — try again or choose another method.';
+    },
+  }).render('#paypalContainer');
+}
+
+function togglePaypal(method) {
+  const isPaypal = method && method.toLowerCase().includes('paypal');
+  paypalContainer.style.display = isPaypal ? 'block' : 'none';
+  mainSubmit.style.display = isPaypal ? 'none' : 'inline-flex';
+  if (isPaypal) initPayPalButtons();
+}
+
+paymentSelect.addEventListener('change', (e) => togglePaypal(e.target.value));
 
 // Scroll reveal
 const observer = new IntersectionObserver((entries) => {

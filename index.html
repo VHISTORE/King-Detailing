@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://www.paypal.com/sdk/js?client-id=AY-VAawwGwlE9LRd5HrKi559aEZY0ICQnNNRBgBjhQ7skvDkVTJsCLp2e5p2WzNfPyTp1I9ow8CVbCqw&currency=GBP&components=buttons,applepay" data-sdk-integration-source="button-factory"></script>
 </head>
 <body>
 
@@ -561,7 +562,8 @@
           <p class="form__total-note" id="totalNote">Final price confirmed after a quick inspection.</p>
         </div>
 
-        <button type="submit" class="btn btn--gold form__submit">Send enquiry</button>
+        <button type="submit" class="btn btn--gold form__submit" id="mainSubmit">Send enquiry</button>
+        <div id="paypalContainer" class="form__full" style="display:none; margin-top: 6px;"></div>
         <p class="form__status" id="formStatus"></p>
       </form>
     </div>
