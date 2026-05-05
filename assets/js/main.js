@@ -1,3 +1,9 @@
+// Always start at the top, ignore browser's saved scroll
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.addEventListener('load', () => {
+  if (!location.hash) window.scrollTo({ top: 0, behavior: 'instant' });
+});
+
 // Year in footer
 document.getElementById('year').textContent = new Date().getFullYear();
 
