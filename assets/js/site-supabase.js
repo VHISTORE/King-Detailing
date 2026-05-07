@@ -18,17 +18,92 @@ async function loadGallery() {
     imgs.forEach(im => tiles.push({ url: im.url, title: row.title || "" }));
   });
   if (!tiles.length) {
-    grid.innerHTML = '<p style="opacity:.7;grid-column:1/-1;text-align:center">Gallery is being updated — check back soon.</p>';
+    grid.innerHTML = '<p style="opacity:.7;text-align:center;width:100%">Gallery is being updated — check back soon.</p>';
     return;
   }
+  const PREVIEW = 10;
   grid.innerHTML = "";
-  tiles.slice(0, 60).forEach(t => {
+  tiles.slice(0, PREVIEW).forEach((t, i) => {
     const item = document.createElement("div");
     item.className = "gallery__item";
     item.style.backgroundImage = `url('${t.url}')`;
     if (t.title) item.title = t.title;
+    item.addEventListener("click", () => openZoom(t.url));
     grid.appendChild(item);
   });
+
+  // View all button
+  const actions = document.getElementById("galleryActions");
+  if (actions) {
+    actions.innerHTML = "";
+    if (tiles.length > PREVIEW) {
+      const btn = document.createElement("button");
+      btn.className = "btn btn--ghost";
+      btn.type = "button";
+      btn.textContent = `View all (${tiles.length})`;
+      btn.addEventListener("click", () => openLightbox(tiles));
+      actions.appendChild(btn);
+    }
+  }
+}
+
+function openLightbox(tiles) {
+  let lb = document.getElementById("kdLightbox");
+  if (!lb) {
+    lb = document.createElement("div");
+    lb.id = "kdLightbox";
+    lb.className = "lightbox";
+    lb.innerHTML = `
+      <div class="lightbox__head">
+        <h3 class="lightbox__title">All works</h3>
+        <button class="lightbox__close" aria-label="Close">×</button>
+      </div>
+      <div class="lightbox__grid"></div>`;
+    document.body.appendChild(lb);
+    lb.querySelector(".lightbox__close").addEventListener("click", closeLightbox);
+    lb.addEventListener("click", e => { if (e.target === lb) closeLightbox(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") { closeLightbox(); closeZoom(); } });
+  }
+  const g = lb.querySelector(".lightbox__grid");
+  g.innerHTML = "";
+  tiles.forEach(t => {
+    const img = document.createElement("img");
+    img.src = t.url;
+    img.alt = t.title || "";
+    img.loading = "lazy";
+    img.addEventListener("click", () => openZoom(t.url));
+    g.appendChild(img);
+  });
+  lb.classList.add("is-open");
+  document.body.style.overflow = "hidden";
+}
+function closeLightbox() {
+  const lb = document.getElementById("kdLightbox");
+  if (lb) lb.classList.remove("is-open");
+  if (!document.getElementById("kdZoom")?.classList.contains("is-open")) {
+    document.body.style.overflow = "";
+  }
+}
+function openZoom(url) {
+  let z = document.getElementById("kdZoom");
+  if (!z) {
+    z = document.createElement("div");
+    z.id = "kdZoom";
+    z.className = "lightbox__zoom";
+    z.innerHTML = `<img alt="" />`;
+    document.body.appendChild(z);
+    z.addEventListener("click", closeZoom);
+  }
+  z.querySelector("img").src = url;
+  z.classList.add("is-open");
+  document.body.style.overflow = "hidden";
+}
+function closeZoom() {
+  const z = document.getElementById("kdZoom");
+  if (z) z.classList.remove("is-open");
+  if (!document.getElementById("kdLightbox")?.classList.contains("is-open")) {
+    document.body.style.overflow = "";
+  }
 }
 
 // ---------- Comments ----------
