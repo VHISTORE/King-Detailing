@@ -164,9 +164,16 @@ h1, h2, h3, .lightbox__title {
 }
 
 /* ================= Main ================= */
-.admin__main { padding: 28px 24px 80px; max-width: 1200px; margin: 0 auto; width: 100%; }
+.admin__main {
+  padding: 28px 24px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
 .admin, .tab, .grid, .list, .card { max-width: 100%; }
-.card__meta, .kv-list, .kv strong { min-width: 0; word-break: break-word; overflow-wrap: anywhere; }
+.card__meta, .kv-list, .kv strong, p, h2 { min-width: 0; word-break: break-word; overflow-wrap: anywhere; }
+.card__body, .upload-form { min-width: 0; }
 .tab { display: none; animation: fadeIn .25s ease; }
 .tab.is-active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -613,11 +620,10 @@ h1, h2, h3, .lightbox__title {
   .admin__tabs {
     width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin: 0 -14px;
-    padding: 0 14px;
     order: 3;
   }
   .admin__tabs::-webkit-scrollbar { display: none; }
