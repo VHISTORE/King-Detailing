@@ -55,29 +55,55 @@ $$(".admin__tabs button").forEach(btn => {
 });
 
 // ========== Gallery ==========
+let pendingFiles = []; // selected files awaiting upload
+
 function bootGallery() {
-  const grid = $("#galleryAdminGrid");
   const addBtn = $("#addGalleryBtn");
   const upload = $("#galleryUpload");
   const form = $("#galleryForm");
   const status = $("#galleryStatus");
   const cancel = $("#galleryCancel");
+  const fileInput = form.querySelector('input[name="file"]');
+
+  // Inject preview area + submit button enable state
+  if (!form.querySelector(".preview-strip")) {
+    const previewWrap = document.createElement("div");
+    previewWrap.className = "preview-strip";
+    previewWrap.id = "galleryPreview";
+    fileInput.parentElement.insertAdjacentElement("afterend", previewWrap);
+  }
+  const preview = $("#galleryPreview");
 
   addBtn.onclick = () => { upload.hidden = !upload.hidden; };
-  cancel.onclick = () => { upload.hidden = true; form.reset(); status.textContent = ""; };
+  cancel.onclick = () => {
+    upload.hidden = true; form.reset(); status.textContent = "";
+    pendingFiles = []; preview.innerHTML = "";
+  };
+
+  fileInput.addEventListener("change", () => {
+    pendingFiles = Array.from(fileInput.files || []);
+    renderPreview(preview);
+  });
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const files = Array.from(form.querySelector('input[name="file"]').files || []);
+    if (!pendingFiles.length) {
+      status.textContent = "Please pick at least one photo.";
+      return;
+    }
     const title = (form.querySelector('input[name="title"]').value || "").trim();
-    if (!files.length) return;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
     try {
       const images = [];
-      for (let i = 0; i < files.length; i++) {
-        const f = files[i];
-        status.textContent = `Uploading ${i + 1} / ${files.length}…`;
-        const img = await uploadOneImage(f);
+      for (let i = 0; i < pendingFiles.length; i++) {
+        const f = pendingFiles[i];
+        status.textContent = `Processing ${i + 1} / ${pendingFiles.length}…`;
+        const compressed = await compressImage(f);
+        status.textContent = `Uploading ${i + 1} / ${pendingFiles.length}…`;
+        const img = await uploadOneImage(compressed, f.name);
         images.push(img);
+        markPreviewDone(preview, i);
       }
       status.textContent = "Saving…";
       const { error: insErr } = await sb.from("gallery").insert({
@@ -90,21 +116,88 @@ function bootGallery() {
       form.reset();
       upload.hidden = true;
       status.textContent = "";
+      pendingFiles = [];
+      preview.innerHTML = "";
       loadGalleryAdmin();
     } catch (err) {
       console.error(err);
-      status.textContent = "Upload failed: " + err.message;
+      status.textContent = "Upload failed: " + (err.message || err);
+    } finally {
+      submitBtn.disabled = false;
     }
   };
 
   loadGalleryAdmin();
 }
 
-async function uploadOneImage(file) {
-  const ext = file.name.split(".").pop();
+function renderPreview(container, files = pendingFiles) {
+  container.innerHTML = "";
+  files.forEach((f, idx) => {
+    const wrap = document.createElement("div");
+    wrap.className = "preview-thumb";
+    wrap.dataset.idx = idx;
+    const url = URL.createObjectURL(f);
+    wrap.innerHTML = `
+      <img src="${url}" alt="" />
+      <button type="button" class="preview-thumb__del" aria-label="Remove">×</button>
+      <span class="preview-thumb__check">✓</span>`;
+    wrap.querySelector(".preview-thumb__del").onclick = () => {
+      pendingFiles.splice(idx, 1);
+      URL.revokeObjectURL(url);
+      renderPreview(container);
+    };
+    container.appendChild(wrap);
+  });
+}
+function markPreviewDone(container, idx) {
+  const el = container.querySelector(`.preview-thumb[data-idx="${idx}"]`);
+  if (el) el.classList.add("is-done");
+}
+
+// Resize image to max 1920px, JPEG 85%. Handles HEIC by relying on the browser's
+// ability to decode it via <img src=ObjectURL> (iOS 17+ Safari supports this).
+async function compressImage(file) {
+  if (!file.type.startsWith("image/") && !/\.heic$/i.test(file.name)) return file;
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const MAX = 1920;
+    let { width, height } = img;
+    const scale = Math.min(1, MAX / Math.max(width, height));
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, width, height);
+    const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.85));
+    if (!blob) return file; // fallback if toBlob failed
+    // Only return compressed if it's actually smaller
+    if (blob.size > file.size) return file;
+    return blob;
+  } catch (e) {
+    console.warn("Compression failed, uploading original:", e);
+    return file;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+async function uploadOneImage(blobOrFile, originalName = "photo.jpg") {
+  const ext = blobOrFile.type === "image/jpeg" ? "jpg" : (originalName.split(".").pop() || "jpg");
   const path = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await sb.storage.from("gallery").upload(path, file, {
-    contentType: file.type
+  const { error } = await sb.storage.from("gallery").upload(path, blobOrFile, {
+    contentType: blobOrFile.type || "image/jpeg",
+    upsert: false
   });
   if (error) throw error;
   const { data: pub } = sb.storage.from("gallery").getPublicUrl(path);
@@ -186,8 +279,10 @@ async function loadGalleryAdmin() {
       try {
         const added = [];
         for (let i = 0; i < files.length; i++) {
+          cardStatus.textContent = `Processing ${i + 1} / ${files.length}…`;
+          const compressed = await compressImage(files[i]);
           cardStatus.textContent = `Uploading ${i + 1} / ${files.length}…`;
-          added.push(await uploadOneImage(files[i]));
+          added.push(await uploadOneImage(compressed, files[i].name));
         }
         const merged = images.concat(added);
         await sb.from("gallery").update({
