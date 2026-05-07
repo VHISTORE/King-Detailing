@@ -17,11 +17,13 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; padding: 0; }
+html { overflow-x: hidden; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--gold); text-decoration: none; }
@@ -242,32 +244,91 @@ h1, h2, h3, .lightbox__title {
 }
 .btn-danger:hover { background: rgba(255,107,107,0.1); border-color: var(--danger); }
 
-/* ================= Upload form ================= */
-.tab__upload {
+/* ================= Upload modal ================= */
+.upload-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,10,14,0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  z-index: 700;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+  animation: fadeIn .15s ease;
+}
+.upload-modal__panel {
   background: var(--bg-1);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px;
-  margin-bottom: 22px;
-  animation: slideDown .2s ease;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.7);
+  animation: pop .22s ease;
+  overflow: hidden;
 }
-@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-.tab__upload form { display: grid; gap: 14px; }
-.tab__upload label { display: grid; gap: 6px; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-.tab__upload input[type="text"], .tab__upload input[type="file"] {
+.upload-modal__head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.upload-modal__head h3 { margin: 0; font-size: 18px; color: var(--gold); }
+.upload-modal__close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  font-size: 22px; line-height: 1; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.upload-modal__close:hover { color: var(--gold); border-color: var(--gold); }
+
+.upload-form { padding: 22px 24px 24px; display: grid; gap: 18px; }
+.upload-form__actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 4px; }
+
+.field { display: grid; gap: 7px; }
+.field__label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.field input[type="text"] {
   background: var(--bg);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 11px 13px;
+  padding: 12px 14px;
   border-radius: var(--radius-sm);
-  font-size: 14px;
-  text-transform: none;
-  letter-spacing: normal;
+  font-size: 15px;
+  font-family: inherit;
   transition: border-color .15s, box-shadow .15s;
 }
-.tab__upload input[type="text"]:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,160,67,.12); }
-.tab__upload input[type="file"] { padding: 9px 13px; }
-.tab__upload-actions { display: flex; gap: 8px; }
+.field input[type="text"]:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,160,67,.12); }
+
+.dropzone {
+  position: relative;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 28px 20px;
+  text-align: center;
+  transition: border-color .15s, background .15s;
+  cursor: pointer;
+}
+.dropzone:hover, .dropzone.is-drag {
+  border-color: var(--gold);
+  background: rgba(212,160,67,0.04);
+}
+.dropzone input[type="file"] {
+  position: absolute; inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.dropzone__inner { display: grid; gap: 8px; justify-items: center; color: var(--text-dim); pointer-events: none; }
+.dropzone__inner svg { color: var(--gold); }
+.dropzone__title { margin: 0; font-size: 15px; color: var(--text); font-weight: 500; }
+.dropzone__title span { color: var(--gold); text-decoration: underline; }
+.dropzone__hint { margin: 0; font-size: 12px; color: var(--text-faint); }
+
 .status { color: var(--text-dim); margin: 0; font-size: 13px; min-height: 1em; }
 
 /* ================= Cards ================= */

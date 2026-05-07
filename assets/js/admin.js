@@ -63,25 +63,51 @@ function bootGallery() {
   const form = $("#galleryForm");
   const status = $("#galleryStatus");
   const cancel = $("#galleryCancel");
+  const cancelBtn = form.querySelector('[data-act="cancel"]');
   const fileInput = form.querySelector('input[name="file"]');
+  const dropzone = $("#galleryDropzone");
 
-  // Inject preview area + submit button enable state
+  // Inject preview area
   if (!form.querySelector(".preview-strip")) {
     const previewWrap = document.createElement("div");
     previewWrap.className = "preview-strip";
     previewWrap.id = "galleryPreview";
-    fileInput.parentElement.insertAdjacentElement("afterend", previewWrap);
+    dropzone.insertAdjacentElement("afterend", previewWrap);
   }
   const preview = $("#galleryPreview");
 
-  addBtn.onclick = () => { upload.hidden = !upload.hidden; };
-  cancel.onclick = () => {
-    upload.hidden = true; form.reset(); status.textContent = "";
-    pendingFiles = []; preview.innerHTML = "";
+  const openModal = () => { upload.hidden = false; document.body.style.overflow = "hidden"; };
+  const closeModal = () => {
+    upload.hidden = true;
+    document.body.style.overflow = "";
+    form.reset();
+    status.textContent = "";
+    pendingFiles = [];
+    preview.innerHTML = "";
   };
+
+  addBtn.onclick = openModal;
+  cancel.onclick = closeModal;
+  cancelBtn.onclick = closeModal;
+  upload.addEventListener("click", e => { if (e.target === upload) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !upload.hidden) closeModal(); });
 
   fileInput.addEventListener("change", () => {
     pendingFiles = Array.from(fileInput.files || []);
+    renderPreview(preview);
+  });
+
+  // Drag & drop
+  ["dragenter", "dragover"].forEach(ev => dropzone.addEventListener(ev, e => {
+    e.preventDefault(); dropzone.classList.add("is-drag");
+  }));
+  ["dragleave", "drop"].forEach(ev => dropzone.addEventListener(ev, e => {
+    e.preventDefault(); dropzone.classList.remove("is-drag");
+  }));
+  dropzone.addEventListener("drop", e => {
+    const files = Array.from(e.dataTransfer?.files || []).filter(f => f.type.startsWith("image/"));
+    if (!files.length) return;
+    pendingFiles = files;
     renderPreview(preview);
   });
 
@@ -113,12 +139,9 @@ function bootGallery() {
         title
       });
       if (insErr) throw insErr;
-      form.reset();
-      upload.hidden = true;
-      status.textContent = "";
-      pendingFiles = [];
-      preview.innerHTML = "";
-      toast(`Added work with ${images.length} photo${images.length === 1 ? "" : "s"}`);
+      const count = images.length;
+      closeModal();
+      toast(`Added work with ${count} photo${count === 1 ? "" : "s"}`);
       loadGalleryAdmin();
     } catch (err) {
       console.error(err);

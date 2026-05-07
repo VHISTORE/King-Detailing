@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" href="assets/img/logo.png" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/admin.css?v=2" />
+  <link rel="stylesheet" href="assets/css/admin.css?v=3" />
 </head>
 <body>
 
@@ -51,16 +51,39 @@
         <h2>Gallery <span class="counter" id="galleryCounter"></span></h2>
         <button id="addGalleryBtn" class="btn-primary">+ Add work</button>
       </div>
-      <div class="tab__upload" id="galleryUpload" hidden>
-        <form id="galleryForm">
-          <label>Title (optional)<input type="text" name="title" placeholder="BMW X5 ceramic coating" /></label>
-          <label>Photos (you can pick several)<input type="file" name="file" accept="image/*" multiple required /></label>
-          <div class="tab__upload-actions">
-            <button type="submit" class="btn-primary">Upload</button>
-            <button type="button" id="galleryCancel" class="btn-ghost">Cancel</button>
+      <div class="upload-modal" id="galleryUpload" hidden>
+        <div class="upload-modal__panel">
+          <div class="upload-modal__head">
+            <h3>Add new work</h3>
+            <button type="button" class="upload-modal__close" id="galleryCancel" aria-label="Close">×</button>
           </div>
-          <p class="status" id="galleryStatus"></p>
-        </form>
+          <form id="galleryForm" class="upload-form">
+            <label class="field">
+              <span class="field__label">Title (optional)</span>
+              <input type="text" name="title" placeholder="e.g. BMW X5 ceramic coating" />
+            </label>
+
+            <div class="dropzone" id="galleryDropzone">
+              <input type="file" name="file" accept="image/*" multiple required />
+              <div class="dropzone__inner">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p class="dropzone__title">Drop photos here or <span>browse</span></p>
+                <p class="dropzone__hint">JPG, PNG, HEIC · multiple allowed · auto-resized</p>
+              </div>
+            </div>
+
+            <p class="status" id="galleryStatus"></p>
+
+            <div class="upload-form__actions">
+              <button type="button" class="btn-ghost" data-act="cancel">Cancel</button>
+              <button type="submit" class="btn-primary">Upload</button>
+            </div>
+          </form>
+        </div>
       </div>
       <div class="grid" id="galleryAdminGrid"></div>
     </section>
@@ -103,6 +126,6 @@
   </main>
 </div>
 
-<script type="module" src="assets/js/admin.js?v=2"></script>
+<script type="module" src="assets/js/admin.js?v=3"></script>
 </body>
 </html>
