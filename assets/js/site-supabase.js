@@ -6,20 +6,27 @@ async function loadGallery() {
   if (!grid) return;
   const { data, error } = await sb
     .from("gallery")
-    .select("image_url,title")
+    .select("image_url,title,images")
     .order("created_at", { ascending: false })
-    .limit(24);
+    .limit(50);
   if (error) { console.warn("Gallery load failed:", error); return; }
-  if (!data || !data.length) {
+  const tiles = [];
+  (data || []).forEach(row => {
+    const imgs = Array.isArray(row.images) && row.images.length
+      ? row.images
+      : (row.image_url ? [{ url: row.image_url }] : []);
+    imgs.forEach(im => tiles.push({ url: im.url, title: row.title || "" }));
+  });
+  if (!tiles.length) {
     grid.innerHTML = '<p style="opacity:.7;grid-column:1/-1;text-align:center">Gallery is being updated — check back soon.</p>';
     return;
   }
   grid.innerHTML = "";
-  data.forEach(row => {
+  tiles.slice(0, 60).forEach(t => {
     const item = document.createElement("div");
     item.className = "gallery__item";
-    item.style.backgroundImage = `url('${row.image_url}')`;
-    if (row.title) item.title = row.title;
+    item.style.backgroundImage = `url('${t.url}')`;
+    if (t.title) item.title = t.title;
     grid.appendChild(item);
   });
 }

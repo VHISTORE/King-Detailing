@@ -68,22 +68,22 @@ function bootGallery() {
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const fd = new FormData(form);
-    const file = fd.get("file");
-    const title = (fd.get("title") || "").toString().trim();
-    if (!file || !file.size) return;
-    status.textContent = "Uploading…";
+    const files = Array.from(form.querySelector('input[name="file"]').files || []);
+    const title = (form.querySelector('input[name="title"]').value || "").trim();
+    if (!files.length) return;
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error: upErr } = await sb.storage.from("gallery").upload(path, file, {
-        contentType: file.type
-      });
-      if (upErr) throw upErr;
-      const { data: pub } = sb.storage.from("gallery").getPublicUrl(path);
+      const images = [];
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        status.textContent = `Uploading ${i + 1} / ${files.length}…`;
+        const img = await uploadOneImage(f);
+        images.push(img);
+      }
+      status.textContent = "Saving…";
       const { error: insErr } = await sb.from("gallery").insert({
-        image_url: pub.publicUrl,
-        storage_path: path,
+        image_url: images[0].url,
+        storage_path: images[0].path,
+        images,
         title
       });
       if (insErr) throw insErr;
@@ -100,6 +100,17 @@ function bootGallery() {
   loadGalleryAdmin();
 }
 
+async function uploadOneImage(file) {
+  const ext = file.name.split(".").pop();
+  const path = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await sb.storage.from("gallery").upload(path, file, {
+    contentType: file.type
+  });
+  if (error) throw error;
+  const { data: pub } = sb.storage.from("gallery").getPublicUrl(path);
+  return { url: pub.publicUrl, path };
+}
+
 async function loadGalleryAdmin() {
   const grid = $("#galleryAdminGrid");
   const { data, error } = await sb.from("gallery").select("*").order("created_at", { ascending: false });
@@ -107,28 +118,91 @@ async function loadGalleryAdmin() {
   grid.innerHTML = "";
   if (!data.length) { grid.innerHTML = '<p class="empty">No works yet — add the first one.</p>'; return; }
   data.forEach(d => {
+    const images = Array.isArray(d.images) && d.images.length
+      ? d.images
+      : (d.image_url ? [{ url: d.image_url, path: d.storage_path }] : []);
+    const cover = images[0]?.url || "";
+    const thumbs = images.map((im, idx) => `
+      <div class="thumb" data-idx="${idx}">
+        <img src="${im.url}" alt="" />
+        <button class="thumb__del" data-act="delPhoto" data-idx="${idx}" title="Delete this photo">×</button>
+      </div>
+    `).join("");
     const card = document.createElement("div");
     card.className = "card card--photo";
     card.innerHTML = `
-      <div class="card__img" style="background-image:url('${d.image_url}')"></div>
+      <div class="card__img" style="background-image:url('${cover}')">
+        <span class="card__count">${images.length} photo${images.length === 1 ? "" : "s"}</span>
+      </div>
       <div class="card__body">
         <input class="card__title" value="${escapeAttr(d.title || "")}" placeholder="Title" />
+        <div class="thumbs">${thumbs}</div>
+        <label class="add-more">
+          + Add more photos
+          <input type="file" accept="image/*" multiple hidden data-act="addMore" />
+        </label>
+        <p class="status" data-role="status"></p>
         <div class="card__actions">
-          <button class="btn-ghost" data-act="save">Save</button>
-          <button class="btn-danger" data-act="delete">Delete</button>
+          <button class="btn-ghost" data-act="save">Save title</button>
+          <button class="btn-danger" data-act="delete">Delete work</button>
         </div>
       </div>`;
+    const cardStatus = card.querySelector('[data-role="status"]');
+
     card.querySelector('[data-act="save"]').onclick = async () => {
       const t = card.querySelector(".card__title").value.trim();
       await sb.from("gallery").update({ title: t }).eq("id", d.id);
       flash(card);
     };
+
     card.querySelector('[data-act="delete"]').onclick = async () => {
-      if (!confirm("Delete this work?")) return;
-      if (d.storage_path) await sb.storage.from("gallery").remove([d.storage_path]);
+      if (!confirm("Delete this whole work and all its photos?")) return;
+      const paths = images.map(i => i.path).filter(Boolean);
+      if (paths.length) await sb.storage.from("gallery").remove(paths);
       await sb.from("gallery").delete().eq("id", d.id);
       loadGalleryAdmin();
     };
+
+    card.querySelectorAll('[data-act="delPhoto"]').forEach(btn => {
+      btn.onclick = async () => {
+        const idx = +btn.dataset.idx;
+        if (images.length === 1) { alert("Can't delete the last photo. Delete the whole work instead."); return; }
+        if (!confirm("Delete this photo?")) return;
+        const removed = images[idx];
+        const remaining = images.filter((_, i) => i !== idx);
+        if (removed.path) await sb.storage.from("gallery").remove([removed.path]);
+        await sb.from("gallery").update({
+          images: remaining,
+          image_url: remaining[0].url,
+          storage_path: remaining[0].path
+        }).eq("id", d.id);
+        loadGalleryAdmin();
+      };
+    });
+
+    card.querySelector('[data-act="addMore"]').onchange = async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      try {
+        const added = [];
+        for (let i = 0; i < files.length; i++) {
+          cardStatus.textContent = `Uploading ${i + 1} / ${files.length}…`;
+          added.push(await uploadOneImage(files[i]));
+        }
+        const merged = images.concat(added);
+        await sb.from("gallery").update({
+          images: merged,
+          image_url: merged[0].url,
+          storage_path: merged[0].path
+        }).eq("id", d.id);
+        cardStatus.textContent = "";
+        loadGalleryAdmin();
+      } catch (err) {
+        console.error(err);
+        cardStatus.textContent = "Upload failed: " + err.message;
+      }
+    };
+
     grid.appendChild(card);
   });
 }
