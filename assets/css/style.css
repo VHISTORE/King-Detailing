@@ -609,12 +609,12 @@ ul { list-style: none; }
 
 @media (max-width: 900px) {
   .scroll-fab {
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
     right: 16px;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+    bottom: 100px;
   }
-  .scroll-fab svg { width: 24px; height: 24px; }
+  .scroll-fab svg { width: 26px; height: 26px; }
 }
 
 /* === Gallery (horizontal scroll) === */
