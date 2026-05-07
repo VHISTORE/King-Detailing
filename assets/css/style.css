@@ -603,8 +603,19 @@ ul { list-style: none; }
 }
 .scroll-fab.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .scroll-fab:hover { background: var(--gold); color: #0f1115; }
+.scroll-fab:active { background: var(--gold); color: #0f1115; }
 .scroll-fab svg { width: 22px; height: 22px; transition: transform .25s; }
 .scroll-fab.is-up svg { transform: rotate(180deg); }
+
+@media (max-width: 900px) {
+  .scroll-fab {
+    width: 52px;
+    height: 52px;
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+  }
+  .scroll-fab svg { width: 24px; height: 24px; }
+}
 
 /* === Gallery (horizontal scroll) === */
 .gallery {
