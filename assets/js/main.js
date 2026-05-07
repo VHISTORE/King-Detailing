@@ -1,8 +1,57 @@
-// Always start at the top, ignore browser's saved scroll
+// Always start at the top, even if URL has a hash from a previous visit
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+(() => {
+  const navEntry = performance.getEntriesByType?.('navigation')?.[0];
+  const isReload = navEntry?.type === 'reload' || performance.navigation?.type === 1;
+  if (isReload && location.hash) {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+})();
 window.addEventListener('load', () => {
   if (!location.hash) window.scrollTo({ top: 0, behavior: 'instant' });
 });
+
+// Floating scroll button — direction follows user's last scroll direction
+(() => {
+  const btn = document.createElement('button');
+  btn.className = 'scroll-fab';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Scroll');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  document.body.appendChild(btn);
+
+  let lastY = window.scrollY;
+  let dir = 'down'; // current arrow direction
+  const setDir = (d) => {
+    if (d === dir) return;
+    dir = d;
+    btn.classList.toggle('is-up', d === 'up');
+  };
+
+  const update = () => {
+    const y = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    // Hide near top (no need yet) and near bottom (when going down)
+    const show = y > 200;
+    btn.classList.toggle('is-visible', show);
+    if (y > lastY + 4) setDir('down');
+    else if (y < lastY - 4) setDir('up');
+    // If at very bottom, force "up"
+    if (max - y < 60) setDir('up');
+    lastY = y;
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+
+  btn.addEventListener('click', () => {
+    if (dir === 'up') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const max = document.documentElement.scrollHeight;
+      window.scrollTo({ top: max, behavior: 'smooth' });
+    }
+  });
+})();
 
 // Year in footer
 document.getElementById('year').textContent = new Date().getFullYear();
