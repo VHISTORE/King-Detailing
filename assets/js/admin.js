@@ -1,4 +1,4 @@
-import { sb, ADMIN_EMAIL } from "./supabase-init.js";
+import { sb, ADMIN_EMAILS } from "./supabase-init.js";
 
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => Array.from(p.querySelectorAll(s));
@@ -18,7 +18,7 @@ loginForm.addEventListener("submit", async (e) => {
     password: fd.get("password")
   });
   if (error) { loginError.textContent = "Wrong email or password."; return; }
-  if (data.user.email !== ADMIN_EMAIL) {
+  if (!ADMIN_EMAILS.includes(data.user.email)) {
     await sb.auth.signOut();
     loginError.textContent = "This account is not authorized.";
     return;
@@ -35,7 +35,7 @@ $("#logoutBtn").addEventListener("click", async () => {
 (async () => {
   const { data } = await sb.auth.getSession();
   const user = data?.session?.user;
-  if (user && user.email === ADMIN_EMAIL) showAdmin(user);
+  if (user && ADMIN_EMAILS.includes(user.email)) showAdmin(user);
 })();
 
 function showAdmin(user) {

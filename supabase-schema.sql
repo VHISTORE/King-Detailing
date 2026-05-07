@@ -10,6 +10,12 @@ create table if not exists public.gallery (
   created_at timestamptz default now()
 );
 
+-- multi-photo support
+alter table public.gallery add column if not exists images jsonb not null default '[]';
+update public.gallery
+set images = jsonb_build_array(jsonb_build_object('url', image_url, 'path', storage_path))
+where jsonb_array_length(images) = 0 and image_url is not null;
+
 create table if not exists public.comments (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) <= 60),
@@ -41,7 +47,10 @@ create table if not exists public.requests (
 -- Hardcoded admin email: vibemusic1712@gmail.com
 create or replace function public.is_admin() returns boolean
 language sql stable as $$
-  select coalesce((auth.jwt() ->> 'email') = 'vibemusic1712@gmail.com', false);
+  select coalesce(
+    (auth.jwt() ->> 'email') in ('vibemusic1712@gmail.com', 'bulgakovakeksandr939@gmail.com'),
+    false
+  );
 $$;
 
 -- ========== Row Level Security ==========

@@ -5,6 +5,9 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 export const SUPABASE_URL = "https://yzgtmzdjsnafmhulqrgg.supabase.co";
 export const SUPABASE_ANON_KEY = "sb_publishable_yhoygFfFyGmYs_Ap1gpOvg_WQ6shpeO";
 
-export const ADMIN_EMAIL = "vibemusic1712@gmail.com";
+export const ADMIN_EMAILS = [
+  "vibemusic1712@gmail.com",
+  "bulgakovakeksandr939@gmail.com"
+];
 
 export const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

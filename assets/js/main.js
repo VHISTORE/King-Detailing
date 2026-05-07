@@ -292,7 +292,7 @@ form.addEventListener('submit', async (e) => {
   } catch (err) {
     console.error(err);
     status.style.color = '#ff6b6b';
-    status.textContent = 'Could not send — please call us on +44 1548 000 000.';
+    status.textContent = 'Could not send — please call us on 07742 559268.';
   }
 });
 
