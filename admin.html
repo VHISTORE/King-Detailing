@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · King Detailing</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" href="assets/img/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/admin.css" />
+</head>
+<body>
+
+<!-- Login screen -->
+<div id="loginView" class="auth">
+  <div class="auth__card">
+    <h1>King Detailing — Admin</h1>
+    <form id="loginForm" class="auth__form">
+      <label>Email<input type="email" name="email" required autocomplete="username" /></label>
+      <label>Password<input type="password" name="password" required autocomplete="current-password" /></label>
+      <button type="submit">Sign in</button>
+      <p class="auth__error" id="loginError"></p>
+    </form>
+    <p class="auth__back"><a href="index.html">← Back to site</a></p>
+  </div>
+</div>
+
+<!-- Admin dashboard -->
+<div id="adminView" class="admin" hidden>
+  <header class="admin__header">
+    <div class="admin__brand">
+      <img src="assets/img/logo.png" alt="" />
+      <strong>Admin</strong>
+    </div>
+    <nav class="admin__tabs">
+      <button data-tab="gallery" class="is-active">Gallery</button>
+      <button data-tab="comments">Comments <span class="badge" id="commentsBadge" hidden>0</span></button>
+      <button data-tab="services">Services</button>
+      <button data-tab="requests">Requests <span class="badge" id="requestsBadge" hidden>0</span></button>
+    </nav>
+    <div class="admin__user">
+      <span id="userEmail"></span>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main class="admin__main">
+    <!-- Gallery tab -->
+    <section class="tab is-active" data-tab="gallery">
+      <div class="tab__head">
+        <h2>Gallery</h2>
+        <button id="addGalleryBtn" class="btn-primary">+ Add work</button>
+      </div>
+      <div class="tab__upload" id="galleryUpload" hidden>
+        <form id="galleryForm">
+          <label>Title (optional)<input type="text" name="title" placeholder="BMW X5 ceramic coating" /></label>
+          <label>Photo<input type="file" name="file" accept="image/*" required /></label>
+          <div class="tab__upload-actions">
+            <button type="submit" class="btn-primary">Upload</button>
+            <button type="button" id="galleryCancel" class="btn-ghost">Cancel</button>
+          </div>
+          <p class="status" id="galleryStatus"></p>
+        </form>
+      </div>
+      <div class="grid" id="galleryAdminGrid"></div>
+    </section>
+
+    <!-- Comments tab -->
+    <section class="tab" data-tab="comments">
+      <div class="tab__head">
+        <h2>Comments</h2>
+        <div class="filters">
+          <button data-filter="pending" class="is-active">Pending</button>
+          <button data-filter="approved">Approved</button>
+          <button data-filter="all">All</button>
+        </div>
+      </div>
+      <div class="list" id="commentsAdminList"></div>
+    </section>
+
+    <!-- Services tab -->
+    <section class="tab" data-tab="services">
+      <div class="tab__head">
+        <h2>Services / Pricing</h2>
+        <button id="addServiceBtn" class="btn-primary">+ Add service</button>
+      </div>
+      <p class="hint">Note: services from Firestore are shown for editing here. To make them appear on the public site, ask Claude to wire the live <code>#pricing</code> section.</p>
+      <div class="list" id="servicesAdminList"></div>
+    </section>
+
+    <!-- Requests tab -->
+    <section class="tab" data-tab="requests">
+      <div class="tab__head">
+        <h2>Booking requests</h2>
+        <div class="filters">
+          <button data-filter="new" class="is-active">New</button>
+          <button data-filter="contacted">Contacted</button>
+          <button data-filter="done">Done</button>
+          <button data-filter="all">All</button>
+        </div>
+      </div>
+      <div class="list" id="requestsAdminList"></div>
+    </section>
+  </main>
+</div>
+
+<script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>

@@ -29,6 +29,7 @@
         <a href="#gallery">Gallery</a>
         <a href="#about">About</a>
         <a href="#reviews">Reviews</a>
+        <a href="#comments">Comments</a>
         <a href="#contact">Contact</a>
       </nav>
       <a href="#contact" class="btn btn--gold header__cta">Book now</a>
@@ -380,13 +381,8 @@
     <div class="container">
       <p class="section__eyebrow">Our work</p>
       <h2 class="section__title">Before & after gallery</h2>
-      <div class="gallery">
-        <div class="gallery__item" style="background-image:url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800')"></div>
-        <div class="gallery__item" style="background-image:url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800')"></div>
-        <div class="gallery__item" style="background-image:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800')"></div>
-        <div class="gallery__item" style="background-image:url('https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800')"></div>
-        <div class="gallery__item" style="background-image:url('https://images.unsplash.com/photo-1542362567-b07e54358753?w=800')"></div>
-        <div class="gallery__item" style="background-image:url('https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800')"></div>
+      <div class="gallery" id="galleryGrid">
+        <p style="opacity:.6;grid-column:1/-1;text-align:center">Loading gallery…</p>
       </div>
     </div>
   </section>
@@ -427,6 +423,34 @@
           <div class="review__author"><strong>James P.</strong><span>Mercedes E-Class</span></div>
         </article>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="comments">
+    <div class="container">
+      <p class="section__eyebrow">Comments</p>
+      <h2 class="section__title">Share your experience</h2>
+      <div class="reviews" id="commentsList">
+        <p style="opacity:.6;text-align:center">Loading comments…</p>
+      </div>
+      <form class="form comment-form" id="commentForm" style="margin-top:30px;max-width:640px;margin-left:auto;margin-right:auto">
+        <label class="form__full">
+          <span>Your name</span>
+          <input type="text" name="name" required maxlength="60" placeholder="Your name" />
+        </label>
+        <label class="form__full">
+          <span>Your car (optional)</span>
+          <input type="text" name="car" maxlength="60" placeholder="e.g. BMW X5" />
+        </label>
+        <label class="form__full">
+          <span>Comment</span>
+          <textarea name="text" rows="3" required maxlength="600" placeholder="Tell us what you think"></textarea>
+        </label>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true" />
+        <button type="submit" class="btn btn--gold form__submit">Send comment</button>
+        <p class="form__status" id="commentStatus"></p>
+        <p style="font-size:13px;opacity:.6;margin-top:6px">Comments are moderated before publishing.</p>
+      </form>
     </div>
   </section>
 
@@ -614,5 +638,6 @@
   </footer>
 
   <script src="assets/js/main.js"></script>
+  <script type="module" src="assets/js/site-supabase.js"></script>
 </body>
 </html>
