@@ -20,8 +20,9 @@ window.addEventListener('load', () => {
   btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
   document.body.appendChild(btn);
 
-  let lastY = window.scrollY;
-  let dir = 'down'; // current arrow direction
+  const getY = () => window.scrollY ?? window.pageYOffset ?? document.documentElement.scrollTop ?? 0;
+  let lastY = getY();
+  let dir = 'down';
   const setDir = (d) => {
     if (d === dir) return;
     dir = d;
@@ -29,19 +30,22 @@ window.addEventListener('load', () => {
   };
 
   const update = () => {
-    const y = window.scrollY;
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    // Hide near top (no need yet) and near bottom (when going down)
-    const show = y > 200;
-    btn.classList.toggle('is-visible', show);
+    const y = getY();
+    const max = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+    btn.classList.toggle('is-visible', y > 150);
     if (y > lastY + 4) setDir('down');
     else if (y < lastY - 4) setDir('up');
-    // If at very bottom, force "up"
     if (max - y < 60) setDir('up');
     lastY = y;
   };
+
   window.addEventListener('scroll', update, { passive: true });
-  update();
+  document.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('touchmove', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  // iOS Safari: scroll fires only at end with momentum; nudge with rAF for first paint
+  requestAnimationFrame(update);
+  setTimeout(update, 500);
 
   btn.addEventListener('click', () => {
     if (dir === 'up') {

@@ -581,14 +581,13 @@ ul { list-style: none; }
 /* === Floating scroll button === */
 .scroll-fab {
   position: fixed;
-  right: max(20px, env(safe-area-inset-right, 0px));
-  bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  bottom: 24px;
   width: 48px;
   height: 48px;
   border-radius: 50%;
   border: 1px solid var(--gold);
-  background: rgba(15, 17, 21, 0.85);
-  backdrop-filter: blur(8px);
+  background: #0f1115;
   color: var(--gold);
   display: flex;
   align-items: center;
@@ -597,9 +596,10 @@ ul { list-style: none; }
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
-  transition: opacity .25s, transform .25s, background .2s;
-  z-index: 80;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  transition: opacity .25s, transform .25s, background .2s, color .2s;
+  z-index: 95;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  -webkit-tap-highlight-color: transparent;
 }
 .scroll-fab.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .scroll-fab:hover { background: var(--gold); color: #0f1115; }
