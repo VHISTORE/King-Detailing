@@ -110,7 +110,6 @@ const FLAT_PRICES = {
   camper: { label: 'Camper / Motorhome',  range: '£140 – £200', display: 'Quoted on inspection' },
 };
 const QUOTE_LABELS = {
-  gift:  'Gift card — amount on request',
   quote: 'Custom quote',
   fleet: 'Fleet enquiry',
 };
@@ -181,22 +180,14 @@ recalc();
 const dateInput = document.getElementById('bookingDate');
 if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
 
-// Gift toggle
-const giftToggle = document.getElementById('giftToggle');
-const giftFields = document.getElementById('giftFields');
-giftToggle.addEventListener('change', () => { giftFields.hidden = !giftToggle.checked; });
-
-// Membership / gift CTA buttons preselect form values
+// Membership CTA buttons preselect form values
 document.querySelectorAll('[data-plan]').forEach(btn => {
   btn.addEventListener('click', () => {
     const plan = btn.dataset.plan;
-    const isGift = btn.dataset.gift === '1';
     if (plan) {
       els.service.value = plan;
       els.service.dispatchEvent(new Event('change'));
     }
-    giftToggle.checked = isGift;
-    giftFields.hidden = !isGift;
   });
 });
 
@@ -256,14 +247,11 @@ function buildBookingMessage(statusOverride) {
     collection: 'Collection & delivery (+£10)',
   }[data.location] || data.location;
   const total = document.getElementById('totalFinal').textContent;
-  const isGift = data.gift === 'on';
   const isMembership = !!FLAT_PRICES[data.service];
 
-  const defaultHeader = isGift
-    ? '🎁 <b>NEW GIFT ORDER</b>'
-    : isMembership
-      ? '👑 <b>NEW MEMBERSHIP</b>'
-      : '🚗 <b>NEW BOOKING</b>';
+  const defaultHeader = isMembership
+    ? '👑 <b>NEW MEMBERSHIP</b>'
+    : '🚗 <b>NEW BOOKING</b>';
   const header = statusOverride || defaultHeader;
   const sep = '━━━━━━━━━━━━━━━';
 
@@ -281,13 +269,13 @@ function buildBookingMessage(statusOverride) {
       `   • Phone: ${escapeHtml(data.phone)}`,
       data.email && `   • Email: ${escapeHtml(data.email)}`,
     ]),
-    !isGift && block('🚙 <b>Vehicle</b>', [
+    block('🚙 <b>Vehicle</b>', [
       `   • Make/Model: ${escapeHtml(data.make || '—')} ${escapeHtml(data.model || '')}`.trim(),
       `   • Size: ${escapeHtml(sizeLabel)}`,
     ]),
-    block(isMembership ? '👑 <b>Plan</b>' : isGift ? '🎁 <b>Gift</b>' : '🧽 <b>Service</b>', [
+    block(isMembership ? '👑 <b>Plan</b>' : '🧽 <b>Service</b>', [
       `   • ${escapeHtml(serviceLabel)}`,
-      !isMembership && !isGift && `   • Where: ${escapeHtml(locationLabel)}`,
+      !isMembership && `   • Where: ${escapeHtml(locationLabel)}`,
       data.address && `   • Address: ${escapeHtml(data.address)}`,
     ]),
     (data.date || data.time) && block('📅 <b>Schedule</b>', [
@@ -297,11 +285,6 @@ function buildBookingMessage(statusOverride) {
     block('💳 <b>Payment</b>', [
       `   • Method: ${escapeHtml(data.payment)}`,
       `   • <b>Total: ${escapeHtml(total)}</b>`,
-    ]),
-    isGift && block('🎀 <b>Recipient</b>', [
-      data.recipient_name && `   • Name: ${escapeHtml(data.recipient_name)}`,
-      data.recipient_contact && `   • Contact: ${escapeHtml(data.recipient_contact)}`,
-      data.gift_message && `   • Message: <i>${escapeHtml(data.gift_message)}</i>`,
     ]),
     data.message && block('💬 <b>Notes</b>', [`   ${escapeHtml(data.message)}`]),
   ].filter(Boolean);

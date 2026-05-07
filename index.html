@@ -278,8 +278,8 @@
   <section class="section" id="memberships">
     <div class="container">
       <p class="section__eyebrow">Memberships</p>
-      <h2 class="section__title">Annual care plans &amp; gift cards</h2>
-      <p class="memberships__lead">Keep your car looking immaculate all year — one fixed price, a fresh valet every 4 weeks. Or gift the experience to someone who deserves a treat.</p>
+      <h2 class="section__title">Annual care plans</h2>
+      <p class="memberships__lead">Keep your car looking immaculate all year — one fixed price, a fresh valet every 4 weeks.</p>
 
       <div class="memberships">
         <article class="membership">
@@ -293,7 +293,6 @@
             <li>Free interior glass refresh</li>
           </ul>
           <a href="#contact" class="btn btn--ghost membership__cta" data-plan="royal">Get this plan</a>
-          <a href="#contact" class="membership__gift" data-plan="royal" data-gift="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 12h18M12 8v13"/><path d="M7.5 8a2.5 2.5 0 010-5c1.7 0 4.5 5 4.5 5s-2.8 0-4.5 0zM16.5 8a2.5 2.5 0 000-5c-1.7 0-4.5 5-4.5 5s2.8 0 4.5 0z"/></svg> Gift this plan</a>
         </article>
 
         <article class="membership membership--featured">
@@ -309,22 +308,6 @@
             <li>Free collection &amp; delivery (within 5 miles)</li>
           </ul>
           <a href="#contact" class="btn btn--gold membership__cta" data-plan="kings">Get this plan</a>
-          <a href="#contact" class="membership__gift" data-plan="kings" data-gift="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 12h18M12 8v13"/><path d="M7.5 8a2.5 2.5 0 010-5c1.7 0 4.5 5 4.5 5s-2.8 0-4.5 0zM16.5 8a2.5 2.5 0 000-5c-1.7 0-4.5 5-4.5 5s2.8 0 4.5 0z"/></svg> Gift this plan</a>
-        </article>
-
-        <article class="membership membership--gift">
-          <div class="membership__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 12h18M12 8v13"/><path d="M7.5 8a2.5 2.5 0 010-5c1.7 0 4.5 5 4.5 5s-2.8 0-4.5 0zM16.5 8a2.5 2.5 0 000-5c-1.7 0-4.5 5-4.5 5s2.8 0 4.5 0z"/></svg></div>
-          <h3 class="membership__name">Gift Card</h3>
-          <p class="membership__price">£25+</p>
-          <p class="membership__tag">Any amount, any service</p>
-          <ul>
-            <li>Choose any amount from £25</li>
-            <li>Redeemable against any service</li>
-            <li>Beautiful printed or digital card</li>
-            <li>Personal message to the recipient</li>
-            <li>Valid 12 months</li>
-          </ul>
-          <a href="#contact" class="btn btn--ghost membership__cta" data-plan="gift" data-gift="1">Buy a gift card</a>
         </article>
       </div>
     </div>
@@ -526,7 +509,6 @@
             <option value="premium">Premium Detail</option>
             <option value="royal">Royal Wash Pass — £450 / year</option>
             <option value="kings">King's Pass — £500 / year</option>
-            <option value="gift">Gift card — any amount</option>
             <option value="quote">Add-on / detailing — quote on inspection</option>
             <option value="fleet">Fleet / Commercial enquiry</option>
           </select>
@@ -551,26 +533,6 @@
             <option>17:00</option>
           </select>
         </label>
-
-        <label class="form__full form__check">
-          <input type="checkbox" name="gift" id="giftToggle" />
-          <span class="form__check-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M3 12h18M12 8v13"/><path d="M7.5 8a2.5 2.5 0 010-5c1.7 0 4.5 5 4.5 5s-2.8 0-4.5 0zM16.5 8a2.5 2.5 0 000-5c-1.7 0-4.5 5-4.5 5s2.8 0 4.5 0z"/></svg> This is a gift for someone</span>
-        </label>
-
-        <div class="form__gift form__full" id="giftFields" hidden>
-          <label>
-            <span>Recipient name</span>
-            <input type="text" name="recipient_name" placeholder="Who's it for?" />
-          </label>
-          <label>
-            <span>Recipient phone or email</span>
-            <input type="text" name="recipient_contact" placeholder="So we can deliver the card" />
-          </label>
-          <label class="form__full">
-            <span>Personal message (optional)</span>
-            <textarea name="gift_message" rows="2" placeholder="A few words for the gift card"></textarea>
-          </label>
-        </div>
 
         <label class="form__full">
           <span>Where?</span>
