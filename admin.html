@@ -6,8 +6,8 @@
   <title>Admin · King Detailing</title>
   <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" href="assets/img/logo.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/admin.css?v=2" />
 </head>
 <body>
 
@@ -48,7 +48,7 @@
     <!-- Gallery tab -->
     <section class="tab is-active" data-tab="gallery">
       <div class="tab__head">
-        <h2>Gallery</h2>
+        <h2>Gallery <span class="counter" id="galleryCounter"></span></h2>
         <button id="addGalleryBtn" class="btn-primary">+ Add work</button>
       </div>
       <div class="tab__upload" id="galleryUpload" hidden>
@@ -68,7 +68,7 @@
     <!-- Comments tab -->
     <section class="tab" data-tab="comments">
       <div class="tab__head">
-        <h2>Comments</h2>
+        <h2>Comments <span class="counter" id="commentsCounter"></span></h2>
         <div class="filters">
           <button data-filter="pending" class="is-active">Pending</button>
           <button data-filter="approved">Approved</button>
@@ -81,7 +81,7 @@
     <!-- Services tab -->
     <section class="tab" data-tab="services">
       <div class="tab__head">
-        <h2>Services / Pricing</h2>
+        <h2>Services / Pricing <span class="counter" id="servicesCounter"></span></h2>
         <button id="addServiceBtn" class="btn-primary">+ Add service</button>
       </div>
       <div class="list" id="servicesAdminList"></div>
@@ -90,7 +90,7 @@
     <!-- Requests tab -->
     <section class="tab" data-tab="requests">
       <div class="tab__head">
-        <h2>Booking requests</h2>
+        <h2>Booking requests <span class="counter" id="requestsCounter"></span></h2>
         <div class="filters">
           <button data-filter="new" class="is-active">New</button>
           <button data-filter="contacted">Contacted</button>
@@ -103,6 +103,6 @@
   </main>
 </div>
 
-<script type="module" src="assets/js/admin.js"></script>
+<script type="module" src="assets/js/admin.js?v=2"></script>
 </body>
 </html>

@@ -118,10 +118,12 @@ function bootGallery() {
       status.textContent = "";
       pendingFiles = [];
       preview.innerHTML = "";
+      toast(`Added work with ${images.length} photo${images.length === 1 ? "" : "s"}`);
       loadGalleryAdmin();
     } catch (err) {
       console.error(err);
-      status.textContent = "Upload failed: " + (err.message || err);
+      status.textContent = "";
+      toast("Upload failed: " + (err.message || err), "err");
     } finally {
       submitBtn.disabled = false;
     }
@@ -206,8 +208,12 @@ async function uploadOneImage(blobOrFile, originalName = "photo.jpg") {
 
 async function loadGalleryAdmin() {
   const grid = $("#galleryAdminGrid");
+  const counter = $("#galleryCounter");
+  if (!grid.children.length) showLoading(grid);
   const { data, error } = await sb.from("gallery").select("*").order("created_at", { ascending: false });
   if (error) { grid.innerHTML = `<p class="empty">Error: ${error.message}</p>`; return; }
+  const photoCount = (data || []).reduce((n, d) => n + (Array.isArray(d.images) ? d.images.length : (d.image_url ? 1 : 0)), 0);
+  if (counter) counter.textContent = `${data.length} work${data.length === 1 ? "" : "s"} · ${photoCount} photo${photoCount === 1 ? "" : "s"}`;
   grid.innerHTML = "";
   if (!data.length) { grid.innerHTML = '<p class="empty">No works yet — add the first one.</p>'; return; }
   data.forEach(d => {
@@ -244,23 +250,26 @@ async function loadGalleryAdmin() {
 
     card.querySelector('[data-act="save"]').onclick = async () => {
       const t = card.querySelector(".card__title").value.trim();
-      await sb.from("gallery").update({ title: t }).eq("id", d.id);
-      flash(card);
+      const { error } = await sb.from("gallery").update({ title: t }).eq("id", d.id);
+      if (error) toast("Save failed: " + error.message, "err");
+      else toast("Title saved");
     };
 
     card.querySelector('[data-act="delete"]').onclick = async () => {
-      if (!confirm("Delete this whole work and all its photos?")) return;
+      if (!await confirmDialog("Delete work", "Delete this whole work and all its photos? This cannot be undone.", { okText: "Delete" })) return;
       const paths = images.map(i => i.path).filter(Boolean);
       if (paths.length) await sb.storage.from("gallery").remove(paths);
-      await sb.from("gallery").delete().eq("id", d.id);
+      const { error } = await sb.from("gallery").delete().eq("id", d.id);
+      if (error) toast("Delete failed: " + error.message, "err");
+      else toast("Work deleted");
       loadGalleryAdmin();
     };
 
     card.querySelectorAll('[data-act="delPhoto"]').forEach(btn => {
       btn.onclick = async () => {
         const idx = +btn.dataset.idx;
-        if (images.length === 1) { alert("Can't delete the last photo. Delete the whole work instead."); return; }
-        if (!confirm("Delete this photo?")) return;
+        if (images.length === 1) { toast("Can't delete the last photo. Delete the work instead.", "err"); return; }
+        if (!await confirmDialog("Delete photo", "Delete this photo?", { okText: "Delete" })) return;
         const removed = images[idx];
         const remaining = images.filter((_, i) => i !== idx);
         if (removed.path) await sb.storage.from("gallery").remove([removed.path]);
@@ -291,10 +300,12 @@ async function loadGalleryAdmin() {
           storage_path: merged[0].path
         }).eq("id", d.id);
         cardStatus.textContent = "";
+        toast(`Added ${added.length} photo${added.length === 1 ? "" : "s"}`);
         loadGalleryAdmin();
       } catch (err) {
         console.error(err);
-        cardStatus.textContent = "Upload failed: " + err.message;
+        cardStatus.textContent = "";
+        toast("Upload failed: " + err.message, "err");
       }
     };
 
@@ -316,12 +327,15 @@ function bootComments() {
 
 async function loadCommentsAdmin() {
   const list = $("#commentsAdminList");
+  const counter = $("#commentsCounter");
+  if (!list.children.length) showLoading(list);
   const { data, error } = await sb.from("comments").select("*").order("created_at", { ascending: false });
   if (error) { list.innerHTML = `<p class="empty">Error: ${error.message}</p>`; return; }
   const pending = data.filter(d => !d.approved).length;
   const badge = $("#commentsBadge");
   badge.textContent = pending;
   badge.hidden = pending === 0;
+  if (counter) counter.textContent = `${data.length} total · ${pending} pending`;
   const docs = data.filter(d => {
     if (commentFilter === "pending") return !d.approved;
     if (commentFilter === "approved") return d.approved;
@@ -351,15 +365,18 @@ async function loadCommentsAdmin() {
       </div>`;
     card.querySelector('[data-act="approve"]')?.addEventListener("click", async () => {
       await sb.from("comments").update({ approved: true }).eq("id", c.id);
+      toast("Comment approved");
       loadCommentsAdmin();
     });
     card.querySelector('[data-act="unapprove"]')?.addEventListener("click", async () => {
       await sb.from("comments").update({ approved: false }).eq("id", c.id);
+      toast("Comment unapproved");
       loadCommentsAdmin();
     });
     card.querySelector('[data-act="delete"]').addEventListener("click", async () => {
-      if (!confirm("Delete this comment?")) return;
+      if (!await confirmDialog("Delete comment", "Delete this comment?", { okText: "Delete" })) return;
       await sb.from("comments").delete().eq("id", c.id);
+      toast("Comment deleted");
       loadCommentsAdmin();
     });
     list.appendChild(card);
@@ -379,10 +396,13 @@ function bootServices() {
 
 async function loadServicesAdmin() {
   const list = $("#servicesAdminList");
+  const counter = $("#servicesCounter");
+  if (!list.children.length) showLoading(list);
   const { data, error } = await sb.from("services").select("*").order("order_idx", { ascending: true });
   if (error) { list.innerHTML = `<p class="empty">Error: ${error.message}</p>`; return; }
+  if (counter) counter.textContent = `${data.length} item${data.length === 1 ? "" : "s"}`;
   list.innerHTML = "";
-  if (!data.length) { list.innerHTML = '<p class="empty">No services yet.</p>'; return; }
+  if (!data.length) { list.innerHTML = '<p class="empty">No services yet — click "Add service".</p>'; return; }
   data.forEach(s => {
     const card = document.createElement("div");
     card.className = "card";
@@ -412,12 +432,14 @@ async function loadServicesAdmin() {
         featured: card.querySelector('[data-f="featured"]').checked,
         order_idx: Number(card.querySelector('[data-f="order_idx"]').value) || 0
       };
-      await sb.from("services").update(upd).eq("id", s.id);
-      flash(card);
+      const { error } = await sb.from("services").update(upd).eq("id", s.id);
+      if (error) toast("Save failed: " + error.message, "err");
+      else toast("Service saved");
     };
     card.querySelector('[data-act="delete"]').onclick = async () => {
-      if (!confirm("Delete this service?")) return;
+      if (!await confirmDialog("Delete service", "Delete this service?", { okText: "Delete" })) return;
       await sb.from("services").delete().eq("id", s.id);
+      toast("Service deleted");
       loadServicesAdmin();
     };
     list.appendChild(card);
@@ -438,12 +460,15 @@ function bootRequests() {
 
 async function loadRequestsAdmin() {
   const list = $("#requestsAdminList");
+  const counter = $("#requestsCounter");
+  if (!list.children.length) showLoading(list);
   const { data, error } = await sb.from("requests").select("*").order("created_at", { ascending: false });
   if (error) { list.innerHTML = `<p class="empty">Error: ${error.message}</p>`; return; }
   const newCount = data.filter(d => (d.status || "new") === "new").length;
   const badge = $("#requestsBadge");
   badge.textContent = newCount;
   badge.hidden = newCount === 0;
+  if (counter) counter.textContent = `${data.length} total · ${newCount} new`;
   const docs = data.filter(d => {
     const st = d.status || "new";
     if (requestFilter === "all") return true;
@@ -476,13 +501,18 @@ async function loadRequestsAdmin() {
           <button class="btn-danger" data-act="delete">Delete</button>
         </div>
       </div>`;
-    const setStatus = async (st) => { await sb.from("requests").update({ status: st }).eq("id", r.id); loadRequestsAdmin(); };
+    const setStatus = async (st) => {
+      await sb.from("requests").update({ status: st }).eq("id", r.id);
+      toast(`Marked ${st}`);
+      loadRequestsAdmin();
+    };
     card.querySelector('[data-act="contacted"]').onclick = () => setStatus("contacted");
     card.querySelector('[data-act="done"]').onclick = () => setStatus("done");
     card.querySelector('[data-act="new"]').onclick = () => setStatus("new");
     card.querySelector('[data-act="delete"]').onclick = async () => {
-      if (!confirm("Delete this request?")) return;
+      if (!await confirmDialog("Delete request", "Delete this booking request?", { okText: "Delete" })) return;
       await sb.from("requests").delete().eq("id", r.id);
+      toast("Request deleted");
       loadRequestsAdmin();
     };
     list.appendChild(card);
@@ -496,10 +526,57 @@ function escapeHtml(s) {
   }[ch]));
 }
 function escapeAttr(s) { return escapeHtml(s); }
-function flash(el) {
-  el.style.transition = "background .3s";
-  el.style.background = "#1f3";
-  setTimeout(() => el.style.background = "", 300);
+function flash() { /* replaced by toast */ }
+
+// ----- Toasts -----
+let toastsEl;
+function ensureToasts() {
+  if (toastsEl) return toastsEl;
+  toastsEl = document.createElement("div");
+  toastsEl.className = "toasts";
+  document.body.appendChild(toastsEl);
+  return toastsEl;
+}
+function toast(message, type = "ok") {
+  const c = ensureToasts();
+  const el = document.createElement("div");
+  el.className = `toast toast--${type}`;
+  el.textContent = message;
+  c.appendChild(el);
+  setTimeout(() => {
+    el.classList.add("is-leaving");
+    setTimeout(() => el.remove(), 250);
+  }, 2800);
+}
+
+// ----- Custom confirm -----
+function confirmDialog(title, message, { okText = "Confirm", danger = true } = {}) {
+  return new Promise(resolve => {
+    const back = document.createElement("div");
+    back.className = "modal-backdrop";
+    back.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true">
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(message)}</p>
+        <div class="modal__actions">
+          <button class="btn-ghost" data-act="cancel">Cancel</button>
+          <button class="${danger ? 'btn-danger' : 'btn-primary'}" data-act="ok">${escapeHtml(okText)}</button>
+        </div>
+      </div>`;
+    const close = (val) => { back.remove(); document.removeEventListener("keydown", esc); resolve(val); };
+    const esc = e => { if (e.key === "Escape") close(false); };
+    back.querySelector('[data-act="cancel"]').onclick = () => close(false);
+    back.querySelector('[data-act="ok"]').onclick = () => close(true);
+    back.addEventListener("click", e => { if (e.target === back) close(false); });
+    document.addEventListener("keydown", esc);
+    document.body.appendChild(back);
+    back.querySelector('[data-act="ok"]').focus();
+  });
+}
+
+// ----- Spinner helper -----
+function showLoading(container) {
+  container.innerHTML = '<div class="loading"><span class="spinner"></span>Loading…</div>';
 }
 
 let booted = false;
